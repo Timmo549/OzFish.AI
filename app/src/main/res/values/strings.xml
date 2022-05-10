@@ -1,0 +1,39 @@
+<resources>
+    <string name="app_name">Fish.AI</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">Fish.AI</string>
+    <string name="second_fragment_label">Results Page</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+	
+<!--  <string translatable="false" name="app_name">HelloAR Java</string> -->
+  <string translatable="false" name="depth_use_explanation">When Depth is enabled on supported devices, virtual objects adapt to the environment by blending in with the real world.</string>
+  <string translatable="false" name="button_text_enable_depth">Enable</string>
+  <string translatable="false" name="button_text_disable_depth">Disable</string>
+  <string translatable="false" name="options_title_with_depth">Your device supports depth</string>
+  <string translatable="false" name="options_title_without_depth">Your device does not support depth</string>
+  <string translatable="false" name="done">Done</string>
+  <string-array translatable="false" name="depth_options_array">
+    <item>Enable depth</item>
+    <item>Show depth map</item>
+  </string-array>
+  <string translatable="false" name="options_title_instant_placement">Instant Placement options</string>
+  <string-array translatable="false" name="instant_placement_options_array">
+    <item>Enable Instant Placement</item>
+  </string-array>	
+  
+    <string name="action_1">Delete</string>
+    <string name="action_2">Set as first</string>
+    <string name="action_3">Horizontal move</string>
+    <string name="action_4">Vertical move</string>
+
+    <string name="action_1_toast">Remove this cube.</string>
+    <string name="action_2_toast">Reorder and set this cube to the first.</string>
+    <string name="action_3_toast">Move on x and z axis.</string>
+    <string name="action_4_toast">Move on y axis.</string>
+  
+</resources>
