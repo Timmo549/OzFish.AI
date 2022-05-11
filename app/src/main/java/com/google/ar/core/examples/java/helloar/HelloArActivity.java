@@ -965,7 +965,6 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
       // Calculate Distance
       Double distance = calculateDistance(wrappedAnchors.get(0).getAnchor().getPose(), wrappedAnchors.get(1).getAnchor().getPose());
       String units = "";
-      int factor = 1;
 
       // Set appropriate measurement for return (>1m is in m, <1m is in cm (or mm))
       if (distance.compareTo(Double.valueOf("1")) >= 0) {
@@ -973,12 +972,12 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
       } else {
         // TODO: Can replace with option for cm or mm.
         units = " cm";
-        factor = 100;
+        distance *= 100;
       }
 
       // TODO: Fix number formatting - make locale specific
       // Display distance
-      result.setText(new BigDecimal(distance).setScale(2, RoundingMode.HALF_UP).multiply(new BigDecimal(factor)).toString().concat(units));
+      result.setText(new BigDecimal(distance).setScale(2, RoundingMode.HALF_UP).toString().concat(units));
     }
   }
 
