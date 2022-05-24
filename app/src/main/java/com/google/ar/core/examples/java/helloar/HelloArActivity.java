@@ -94,8 +94,6 @@ import java.util.Objects;
 
 import com.example.fishai.R;
 
-import org.w3c.dom.Node;
-
 /**
  * This is a simple example that shows how to create an augmented reality (AR) application using the
  * ARCore API. The application will display any detected planes and will allow the user to tap on a
@@ -174,6 +172,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
   private Texture virtualObjectAlbedoInstantPlacementTexture;
 
   private final List<WrappedAnchor> wrappedAnchors = new ArrayList<>();
+  private final List<WrappedAnchor> midAnchors = new ArrayList<>();
 
   // Environmental HDR
   private Texture dfgTexture;
@@ -661,6 +660,40 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
       render.draw(virtualObjectMesh, virtualObjectShader, virtualSceneFramebuffer);
     }
 
+    // TODO: Test for correctness
+    for (WrappedAnchor wrappedAnchor : midAnchors) {
+      Anchor anchor = wrappedAnchor.getAnchor();
+      Trackable trackable = wrappedAnchor.getTrackable();
+      if (anchor.getTrackingState() != TrackingState.TRACKING) {
+        continue;
+      }
+
+      // Get the current pose of an Anchor in world space. The Anchor pose is updated
+      // during calls to session.update() as ARCore refines its estimate of the world.
+      anchor.getPose().toMatrix(modelMatrix, 0);
+
+      // Calculate model/view/projection matrices
+      Matrix.multiplyMM(modelViewMatrix, 0, viewMatrix, 0, modelMatrix, 0);
+      Matrix.multiplyMM(modelViewProjectionMatrix, 0, projectionMatrix, 0, modelViewMatrix, 0);
+
+      // Update shader properties and draw
+      virtualObjectShader.setMat4("u_ModelView", modelViewMatrix);
+      virtualObjectShader.setMat4("u_ModelViewProjection", modelViewProjectionMatrix);
+
+      if (trackable instanceof InstantPlacementPoint
+              && ((InstantPlacementPoint) trackable).getTrackingMethod()
+              == InstantPlacementPoint.TrackingMethod.SCREENSPACE_WITH_APPROXIMATE_DISTANCE) {
+        virtualObjectShader.setTexture(
+                "u_AlbedoTexture", virtualObjectAlbedoInstantPlacementTexture);
+      } else {
+        virtualObjectShader.setTexture("u_AlbedoTexture", virtualObjectAlbedoTexture);
+      }
+
+      render.draw(virtualObjectMesh, virtualObjectShader, virtualSceneFramebuffer);
+    }
+
+
+
     // Compose the virtual scene with the background.
     backgroundRenderer.drawVirtualScene(render, virtualSceneFramebuffer, Z_NEAR, Z_FAR);
   }
@@ -692,7 +725,12 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
           // Cap the number of objects created. This avoids overloading both the
           // rendering system and ARCore.
           if (wrappedAnchors.size() >= 2) {
-            clearAnchor();
+            clearAnchor(wrappedAnchors);
+
+            // TODO: Test for correctness
+            if (!midAnchors.isEmpty()) {
+              clearAnchor(midAnchors);
+            }
           }
 
           // Adding an Anchor tells ARCore that it should track this position in
@@ -704,7 +742,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
           // TODO: Review function call for robustness
           if (wrappedAnchors.size() == 2) {
             measureDistanceOf2Points();
-            //placeMidPointAnchor();
+            placeMidPointAnchor();
           }
 
           // For devices that support the Depth API, shows a dialog to suggest enabling
@@ -905,9 +943,9 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
  }
 
   /** Removes the oldest anchor to allow for a new one to be made. */
- private void clearAnchor() {
-   wrappedAnchors.get(0).getAnchor().detach();
-   wrappedAnchors.remove(0);
+ private void clearAnchor(List<WrappedAnchor> anchorList) {
+   anchorList.get(0).getAnchor().detach();
+   anchorList.remove(0);
  }
 
  /*
@@ -1038,7 +1076,10 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
             (objectPose0.tx() + objectPose1.tx())/2,
             (objectPose0.ty() + objectPose1.ty())/2,
             (objectPose0.tz() + objectPose1.tz())/2};
+
+    // TODO: Correct midPoint rotation to average between both anchors
     Pose midPoint = new Pose(mid, objectPose0.getRotationQuaternion());
+    midAnchors.add(new WrappedAnchor(session.createAnchor(midPoint), null));
   }
 
 /*  private void placeMidAnchor(pose: Pose,
