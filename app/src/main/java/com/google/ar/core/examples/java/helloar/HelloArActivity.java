@@ -94,6 +94,8 @@ import java.util.Objects;
 
 import com.example.fishai.R;
 
+import org.w3c.dom.Node;
+
 /**
  * This is a simple example that shows how to create an augmented reality (AR) application using the
  * ARCore API. The application will display any detected planes and will allow the user to tap on a
@@ -636,14 +638,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
       anchor.getPose().toMatrix(modelMatrix, 0);
 
 
-
-
-      // TODO: Review function call for robustness
-      if (wrappedAnchors.size() == 2) {
-        measureDistanceOf2Points();
-      }
-
-
+      /** This is the previous location of the measureDistance() function call */
 
 
       // Calculate model/view/projection matrices
@@ -697,14 +692,21 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
           // Cap the number of objects created. This avoids overloading both the
           // rendering system and ARCore.
           if (wrappedAnchors.size() >= 2) {
-            wrappedAnchors.get(0).getAnchor().detach();
-            wrappedAnchors.remove(0);
+            clearAnchor();
           }
 
           // Adding an Anchor tells ARCore that it should track this position in
           // space. This anchor is created on the Plane to place the 3D model
           // in the correct position relative both to the world and to the plane.
-          wrappedAnchors.add(new WrappedAnchor(hit.createAnchor(), trackable));
+          createAnchor(hit, trackable);
+//          wrappedAnchors.add(new WrappedAnchor(hit.createAnchor(), trackable));
+
+          // TODO: Review function call for robustness
+          if (wrappedAnchors.size() == 2) {
+            measureDistanceOf2Points();
+            //placeMidPointAnchor();
+          }
+
           // For devices that support the Depth API, shows a dialog to suggest enabling
           // depth-based occlusion. This dialog needs to be spawned on the UI thread.
           this.runOnUiThread(this::showOcclusionDialogIfNeeded);
@@ -897,13 +899,13 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
     session.configure(config);
   }
 
+  /** Creates a Wrapped Anchor and adds it to the anchor list. */
  private void createAnchor(HitResult hitResult, Trackable trackable) {
-   // Creating Anchor.
    wrappedAnchors.add(new WrappedAnchor(hitResult.createAnchor(), trackable));
  }
 
+  /** Removes the oldest anchor to allow for a new one to be made. */
  private void clearAnchor() {
-   // Removing the oldest anchor to allow for a new one to be made.
    wrappedAnchors.get(0).getAnchor().detach();
    wrappedAnchors.remove(0);
  }
@@ -1003,8 +1005,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
     }
   }
 */
-
-  /*
+/*
   private void tapDistanceOf2Points(HitResult hitResult){
     if (wrappedAnchors.size() == 0){
       createAnchor(hitResult, null);
@@ -1026,8 +1027,21 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
       placeAnchor(hitResult, cubeRenderable!!)
     }
   }
+*/
 
-  private void placeMidAnchor(pose: Pose,
+  private void placeMidPointAnchor(){
+    placeMidPointAnchor(wrappedAnchors.get(0).getAnchor().getPose(), wrappedAnchors.get(1).getAnchor().getPose());
+  }
+
+  private void placeMidPointAnchor(Pose objectPose0, Pose objectPose1){
+    float[] mid = {
+            (objectPose0.tx() + objectPose1.tx())/2,
+            (objectPose0.ty() + objectPose1.ty())/2,
+            (objectPose0.tz() + objectPose1.tz())/2};
+    Pose midPoint = new Pose(mid, objectPose0.getRotationQuaternion());
+  }
+
+/*  private void placeMidAnchor(pose: Pose,
                              renderable: Renderable,
                              between: Array<Int> = arrayOf(0,1)){
     val midKey = "${between[0]}_${between[1]}"
