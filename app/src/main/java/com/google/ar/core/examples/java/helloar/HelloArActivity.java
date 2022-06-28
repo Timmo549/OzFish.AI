@@ -442,17 +442,20 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
           new Mesh(
               render, Mesh.PrimitiveMode.POINTS, /*indexBuffer=*/ null, pointCloudVertexBuffers);
 
+      // TODO: Create anchor renders to replace default
       // Virtual object to render (ARCore pawn)
       virtualObjectAlbedoTexture =
           Texture.createFromAsset(
               render,
               "models/pawn_albedo.png",
+//              "models/hl3hl3/cube_cyan.png",
               Texture.WrapMode.CLAMP_TO_EDGE,
               Texture.ColorFormat.SRGB);
       virtualObjectAlbedoInstantPlacementTexture =
           Texture.createFromAsset(
               render,
               "models/pawn_albedo_instant_placement.png",
+//                  "models/hl3hl3/cube_green.png",
               Texture.WrapMode.CLAMP_TO_EDGE,
               Texture.ColorFormat.SRGB);
       Texture virtualObjectPbrTexture =
@@ -463,6 +466,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
               Texture.ColorFormat.LINEAR);
 
       virtualObjectMesh = Mesh.createFromAsset(render, "models/pawn.obj");
+//      virtualObjectMesh = Mesh.createFromAsset(render, "models/hl3hl3/cube.obj");
       virtualObjectShader =
           Shader.createFromAssets(
                   render,
@@ -1015,9 +1019,8 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
         distance *= 100;
       }
 
-      // TODO: Fix number formatting - make locale specific
       // Display distance
-      result.setText(new BigDecimal(distance).setScale(2, RoundingMode.HALF_UP).toString().concat(units));
+      result.setText(String.format("%.2f", new BigDecimal(distance)).concat(units));
     }
   }
 
@@ -1072,13 +1075,28 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
   }
 
   private void placeMidPointAnchor(Pose objectPose0, Pose objectPose1){
-    float[] mid = {
+    float[] midTranslation = {
             (objectPose0.tx() + objectPose1.tx())/2,
             (objectPose0.ty() + objectPose1.ty())/2,
-            (objectPose0.tz() + objectPose1.tz())/2};
+            (objectPose0.tz() + objectPose1.tz())/2
+    };
 
-    // TODO: Correct midPoint rotation to average between both anchors
-    Pose midPoint = new Pose(mid, objectPose0.getRotationQuaternion());
+/*
+    float[] midRotation = {
+            (objectPose0.qw() + objectPose1.qw())/2,
+            (objectPose0.qx() + objectPose1.qx())/2,
+            (objectPose0.qy() + objectPose1.qy())/2,
+            (objectPose0.qz() + objectPose1.qz())/2
+    };
+*/
+    float[] midRotation = {
+            0.0f,
+            0.0f,
+            0.0f,
+            0.0f
+    };
+
+    Pose midPoint = new Pose(midTranslation, midRotation);
     midAnchors.add(new WrappedAnchor(session.createAnchor(midPoint), null));
   }
 
