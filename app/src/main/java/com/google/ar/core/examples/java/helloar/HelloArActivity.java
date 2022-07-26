@@ -85,7 +85,6 @@ import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationExceptio
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -170,6 +169,12 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
   private Shader virtualObjectShader;
   private Texture virtualObjectAlbedoTexture;
   private Texture virtualObjectAlbedoInstantPlacementTexture;
+
+  /** Line Render Variables */
+  // Virtual line
+  private Mesh virtualLineMesh;
+  private Shader virtualLineShader;
+  private Texture virtualLineTexture;
 
   private final List<WrappedAnchor> wrappedAnchors = new ArrayList<>();
   private final List<WrappedAnchor> midAnchors = new ArrayList<>();
@@ -447,15 +452,15 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
       virtualObjectAlbedoTexture =
           Texture.createFromAsset(
               render,
-              "models/pawn_albedo.png",
-//              "models/hl3hl3/cube_cyan.png",
+//              "models/pawn_albedo.png",
+              "models/hl3hl3/cube_green.png",
               Texture.WrapMode.CLAMP_TO_EDGE,
               Texture.ColorFormat.SRGB);
       virtualObjectAlbedoInstantPlacementTexture =
           Texture.createFromAsset(
               render,
-              "models/pawn_albedo_instant_placement.png",
-//                  "models/hl3hl3/cube_green.png",
+//              "models/pawn_albedo_instant_placement.png",
+                  "models/hl3hl3/cube_cyan.png",
               Texture.WrapMode.CLAMP_TO_EDGE,
               Texture.ColorFormat.SRGB);
       Texture virtualObjectPbrTexture =
@@ -465,8 +470,8 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
               Texture.WrapMode.CLAMP_TO_EDGE,
               Texture.ColorFormat.LINEAR);
 
-      virtualObjectMesh = Mesh.createFromAsset(render, "models/pawn.obj");
-//      virtualObjectMesh = Mesh.createFromAsset(render, "models/hl3hl3/cube.obj");
+//      virtualObjectMesh = Mesh.createFromAsset(render, "models/pawn.obj");
+      virtualObjectMesh = Mesh.createFromAsset(render, "models/hl3hl3/cube.obj");
       virtualObjectShader =
           Shader.createFromAssets(
                   render,
@@ -629,6 +634,12 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
 
     // Visualize anchors created by touch.
     render.clear(virtualSceneFramebuffer, 0f, 0f, 0f, 0f);
+
+    // Stores anchors for exisitng wrappedAnchors for use in rendering connecting lines
+    List<Pose> anchors = new ArrayList<>();
+    Pose anchor1;
+    Pose anchor2;
+
     for (WrappedAnchor wrappedAnchor : wrappedAnchors) {
       Anchor anchor = wrappedAnchor.getAnchor();
       Trackable trackable = wrappedAnchor.getTrackable();
@@ -639,6 +650,9 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
       // Get the current pose of an Anchor in world space. The Anchor pose is updated
       // during calls to session.update() as ARCore refines its estimate of the world.
       anchor.getPose().toMatrix(modelMatrix, 0);
+
+      // Adds anchor poses to list for connecting line vertex determination
+      anchors.add(anchor.getPose());
 
 
       /** This is the previous location of the measureDistance() function call */
@@ -696,7 +710,10 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
       render.draw(virtualObjectMesh, virtualObjectShader, virtualSceneFramebuffer);
     }
 
-
+    // If two WrappedAnchors currently exist and therefore a line should be rendered between them
+    if (anchors.size() == 2) {
+      // TODO: implement render.draw() to render line
+    }
 
     // Compose the virtual scene with the background.
     backgroundRenderer.drawVirtualScene(render, virtualSceneFramebuffer, Z_NEAR, Z_FAR);
@@ -746,7 +763,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
           // TODO: Review function call for robustness
           if (wrappedAnchors.size() == 2) {
             measureDistanceOf2Points();
-            placeMidPointAnchor();
+            //placeMidPointAnchor();
           }
 
           // For devices that support the Depth API, shows a dialog to suggest enabling
@@ -988,15 +1005,6 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
       measureDistanceOf2Points(distanceMeter)
     }
   }
-
-
-  private void measureDistanceOf2Points(Float distanceMeter){
-    val distanceTextCM = makeDistanceTextWithCM(distanceMeter)
-    val textView = (distanceCardViewRenderable!!.view as LinearLayout)
-            .findViewById<TextView>(R.id.distanceCard)
-            textView.text = distanceTextCM
-//    Log.d(TAG, "distance: ${distanceTextCM}")
-  }
 */
 
   /** Displays the distance between two anchors */
@@ -1046,29 +1054,6 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
     }
   }
 */
-/*
-  private void tapDistanceOf2Points(HitResult hitResult){
-    if (wrappedAnchors.size() == 0){
-      createAnchor(hitResult, null);
-    }
-    else if (wrappedAnchors.size() == 1){
-      createAnchor(hitResult, null);
-
-      float[] midPosition = new Array<Float>(
-              (wrappedAnchors.get(0).getAnchor().getPose().tx() + wrappedAnchors.get(1).getAnchor().getPose().tx()) / 2,
-              (wrappedAnchors.get(0).getAnchor().getPose().ty() + wrappedAnchors.get(1).getAnchor().getPose().ty()) / 2,
-              (wrappedAnchors.get(0).getAnchor().getPose().tz() + wrappedAnchors.get(1).getAnchor().getPose().tz()) / 2);
-      float[] quaternion = new float[](0.0f,0.0f,0.0f,0.0f);
-      Pose pose = new Pose(midPosition, quaternion);
-
-      placeMidAnchor(pose, distanceCardViewRenderable!!)
-    }
-    else {
-      clearAllAnchors()
-      placeAnchor(hitResult, cubeRenderable!!)
-    }
-  }
-*/
 
   private void placeMidPointAnchor(){
     placeMidPointAnchor(wrappedAnchors.get(0).getAnchor().getPose(), wrappedAnchors.get(1).getAnchor().getPose());
@@ -1099,32 +1084,6 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
     Pose midPoint = new Pose(midTranslation, midRotation);
     midAnchors.add(new WrappedAnchor(session.createAnchor(midPoint), null));
   }
-
-/*  private void placeMidAnchor(pose: Pose,
-                             renderable: Renderable,
-                             between: Array<Int> = arrayOf(0,1)){
-    val midKey = "${between[0]}_${between[1]}"
-    val anchor = arFragment!!.arSceneView.session!!.createAnchor(pose)
-    midAnchors.put(midKey, anchor)
-
-    val anchorNode = AnchorNode(anchor).apply {
-      isSmoothed = true
-      setParent(arFragment!!.arSceneView.scene)
-    }
-    midAnchorNodes.put(midKey, anchorNode)
-
-    val node = TransformableNode(arFragment!!.transformationSystem)
-            .apply{
-      this.rotationController.isEnabled = false
-      this.scaleController.isEnabled = false
-      this.translationController.isEnabled = true
-      this.renderable = renderable
-      setParent(anchorNode)
-    }
-    arFragment!!.arSceneView.scene.addOnUpdateListener(this)
-    arFragment!!.arSceneView.scene.addChild(anchorNode)
-  }
-*/
 
 }
 
