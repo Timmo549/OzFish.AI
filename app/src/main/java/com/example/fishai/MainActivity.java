@@ -1,7 +1,11 @@
 package com.example.fishai;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,8 +14,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -19,6 +28,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.fishai.databinding.ActivityMainBinding;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.Session;
 import com.google.ar.core.examples.java.common.helpers.CameraPermissionHelper;
@@ -32,6 +42,7 @@ import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationExceptio
 
 public class MainActivity extends AppCompatActivity {
     Bitmap theImage;
+    private static final int CAMERA_REQUEST = 1888;
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
 
@@ -72,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Enable AR-related functionality on ARCore supported devices only.
         if (maybeEnableArButton()) {
-            Button button = (Button) findViewById(R.id.button_measure);
+            Button button = findViewById(R.id.button_measure);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -81,9 +92,16 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-
         // Enable AR-related functionality on ARCore supported devices only.
-//        maybeEnableArButton();
+        if (maybeEnableCameraButton()) {
+            Button button = findViewById(R.id.button_measure);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openMeasure();
+                }
+            });
+        }
     }
 
     @Override
@@ -103,12 +121,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        // Check camera permission.
+/*        // Check camera permission.
         // ARCore requires camera permission to operate.
         if (!CameraPermissionHelper.hasCameraPermission(this)) {
             CameraPermissionHelper.requestCameraPermission(this);
             return;
         }
+*/
 /*
         // Ensure that Google Play Services for AR and ARCore device profile data are
         // installed and up to date.
@@ -188,8 +207,23 @@ public class MainActivity extends AppCompatActivity {
         back_pressed = System.currentTimeMillis();
     }
 
-    boolean maybeEnableArButton() {
-        Button button = (Button) findViewById(R.id.button_measure);
+    private boolean maybeEnableCameraButton() {
+        FloatingActionButton button = findViewById(R.id.fab);
+            if (this.getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)){
+                // this device has a camera
+                button.setVisibility(View.VISIBLE);
+                button.setEnabled(true);
+                return true;
+            } else {
+                // no camera on this device
+                button.setVisibility(View.INVISIBLE);
+                button.setEnabled(false);
+                return false;
+            }
+        }
+
+    private boolean maybeEnableArButton() {
+        Button button = findViewById(R.id.button_measure);
         ArCoreApk.Availability availability = ArCoreApk.getInstance().checkAvailability(this);
         if (availability.isTransient()) {
             // Continue to query availability at 5Hz while compatibility is checked in the background.
@@ -230,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
     public void openCamera() {
         // Start Activity to take photos with the Phone's Rear Camera
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivity(cameraIntent);
+        startActivityForResult(cameraIntent, CAMERA_REQUEST);
     }
 
     public void openMeasure() {
@@ -239,13 +273,20 @@ public class MainActivity extends AppCompatActivity {
         startActivity(measureFish);
     }
 
-/**    @Override
+    public void openMLEngine(Bitmap image) {
+        // Start Activity to identify fish with the TensorFlow Lite ML Engine
+//        Intent MLIntent = new Intent(this, TBA.class);
+//        startActivity(MLIntent);
+    }
+
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK)
-        {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             theImage = (Bitmap) data.getExtras().get("data");
-            photo=getEncodedString(theImage);
-            setDataToDataBase();
+            ImageView imageView = findViewById(R.id.image_view);
+            imageView.setImageBitmap(theImage);
         }
-    } **/
+    }
 }
