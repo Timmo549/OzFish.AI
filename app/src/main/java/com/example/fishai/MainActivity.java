@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -26,6 +27,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.examples.java.common.helpers.CameraPermissionHelper;
 import com.google.ar.core.examples.java.helloar.HelloArActivity;
+import com.tensorflow.lite.examples.classification.Classifier;
+import com.tensorflow.lite.examples.classification.ClassifierFloatMobileNet;
+import com.tensorflow.lite.examples.classification.ClassifierQuantizedMobileNet;
+
+import java.io.IOException;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     Bitmap image;
@@ -223,6 +230,20 @@ public class MainActivity extends AppCompatActivity {
             // Displays the image as the background of the main application screen
             ImageView imageView = findViewById(R.id.image_view);
             imageView.setImageBitmap(image);
+
+            try {
+                Classifier classifier = new ClassifierQuantizedMobileNet(this, Classifier.Device.NNAPI, 1);
+                List<Classifier.Recognition> results = classifier.recognizeImage(image, 0);
+                TextView textView = findViewById(R.id.textView);
+                int counter = 1;
+                textView.setText("Results: \n");
+                for (Classifier.Recognition result : results) {
+                    textView.append(counter++ + ": " + result.getId() + " " + result.getConfidence() + "\n");
+                }
+                classifier.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
