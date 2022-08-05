@@ -1,12 +1,9 @@
 package com.example.fishai;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.net.Uri;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,9 +14,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -30,31 +24,14 @@ import androidx.navigation.ui.NavigationUI;
 import com.example.fishai.databinding.ActivityMainBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.ar.core.ArCoreApk;
-import com.google.ar.core.Session;
 import com.google.ar.core.examples.java.common.helpers.CameraPermissionHelper;
-import com.google.ar.core.examples.java.common.helpers.DisplayRotationHelper;
 import com.google.ar.core.examples.java.helloar.HelloArActivity;
-import com.google.ar.core.exceptions.UnavailableApkTooOldException;
-import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException;
-import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException;
-import com.google.ar.core.exceptions.UnavailableSdkTooOldException;
-import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException;
 
 public class MainActivity extends AppCompatActivity {
-    Bitmap theImage;
+    Bitmap image;
     private static final int CAMERA_REQUEST = 1888;
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
-
-    private DisplayRotationHelper displayRotationHelper;
-    private Session session;
-
-    // Rendering. The Renderers are created here, and initialized when the GL surface is created.
-    private GLSurfaceView surfaceView;
-
-    // requestInstall(Activity, true) will triggers installation of
-    // Google Play Services for AR if necessary.
-    private boolean mUserRequestedInstall = true;
 
     private static final int TIME_DELAY = 2000;
     private static long back_pressed;
@@ -92,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        // Enable AR-related functionality on ARCore supported devices only.
+        // Enable Camera related functionality on devices with accessible cameras only.
         if (maybeEnableCameraButton()) {
             Button button = findViewById(R.id.button_measure);
             button.setOnClickListener(new View.OnClickListener() {
@@ -105,59 +82,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-/*        if (session != null) {
-            // Explicitly close ARCore Session to release native resources.
-            // Review the API reference for important considerations before calling close() in apps with
-            // more complicated lifecycle requirements:
-            // https://developers.google.com/ar/reference/java/arcore/reference/com/google/ar/core/Session#close()
-            session.close();
-            session = null;
-        }*/
-        super.onDestroy();
-    }
+    protected void onDestroy() { super.onDestroy(); }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-
-/*        // Check camera permission.
-        // ARCore requires camera permission to operate.
-        if (!CameraPermissionHelper.hasCameraPermission(this)) {
-            CameraPermissionHelper.requestCameraPermission(this);
-            return;
-        }
-*/
-/*
-        // Ensure that Google Play Services for AR and ARCore device profile data are
-        // installed and up to date.
-        try {
-            if (session == null) {
-                switch (ArCoreApk.getInstance().requestInstall(this, mUserRequestedInstall)) {
-                    case INSTALLED:
-                        // Success: Safe to create the AR session.
-                        session = new Session(this);
-                        break;
-                    case INSTALL_REQUESTED:
-                        // When this method returns `INSTALL_REQUESTED`:
-                        // 1. ARCore pauses this activity.
-                        // 2. ARCore prompts the user to install or update Google Play
-                        //    Services for AR (market://details?id=com.google.ar.core).
-                        // 3. ARCore downloads the latest device profile data.
-                        // 4. ARCore resumes this activity. The next invocation of
-                        //    requestInstall() will either return `INSTALLED` or throw an
-                        //    exception if the installation or update did not succeed.
-                        mUserRequestedInstall = false;
-                        return;
-                }
-            }
-        } catch (UnavailableUserDeclinedInstallationException | UnavailableDeviceNotCompatibleException | UnavailableArcoreNotInstalledException | UnavailableApkTooOldException | UnavailableSdkTooOldException e) {
-            // Display an appropriate message to the user and return gracefully.
-            Toast.makeText(this, "TODO: handle exception " + e, Toast.LENGTH_LONG)
-                    .show();
-            return; // mSession remains null, since session creation has failed.
-        }*/
-    }
+    protected void onResume() { super.onResume(); }
 
     @Override
     public void onPause() {
@@ -198,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        // If the user double taps the back button, the application will close
         if (back_pressed + TIME_DELAY > System.currentTimeMillis()) {
             super.onBackPressed();
         } else {
@@ -209,18 +138,19 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean maybeEnableCameraButton() {
         FloatingActionButton button = findViewById(R.id.fab);
-            if (this.getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)){
-                // this device has a camera
-                button.setVisibility(View.VISIBLE);
-                button.setEnabled(true);
-                return true;
-            } else {
-                // no camera on this device
-                button.setVisibility(View.INVISIBLE);
-                button.setEnabled(false);
-                return false;
-            }
+        // Test to see if the device has an available camera to leverage
+        if (this.getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)){
+            // This device has a camera, so enable the camera functionality
+            button.setVisibility(View.VISIBLE);
+            button.setEnabled(true);
+            return true;
+        } else {
+            // No camera on this device, so disable the camera functionality
+            button.setVisibility(View.INVISIBLE);
+            button.setEnabled(false);
+            return false;
         }
+    }
 
     private boolean maybeEnableArButton() {
         Button button = findViewById(R.id.button_measure);
@@ -239,7 +169,8 @@ public class MainActivity extends AppCompatActivity {
                 button.setVisibility(View.VISIBLE);
                 button.setEnabled(true);
                 return true;
-        } else { // The device is unsupported or unknown.
+        } else {
+            // The device is unsupported or unknown.
             // AR not supported
             button.setVisibility(View.INVISIBLE);
             button.setEnabled(false);
@@ -262,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openCamera() {
-        // Start Activity to take photos with the Phone's Rear Camera
+        // Start Activity to take photos with the Phone's Camera
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(cameraIntent, CAMERA_REQUEST);
     }
@@ -283,10 +214,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        // When the camera image capture activity concludes
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
-            theImage = (Bitmap) data.getExtras().get("data");
+            // Extract the image data from the activity results
+            image = (Bitmap) data.getExtras().get("data");
+
+            // Currently for Debug purposes
+            // Displays the image as the background of the main application screen
             ImageView imageView = findViewById(R.id.image_view);
-            imageView.setImageBitmap(theImage);
+            imageView.setImageBitmap(image);
         }
     }
 }
