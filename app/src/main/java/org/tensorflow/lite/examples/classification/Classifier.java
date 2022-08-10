@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-package com.tensorflow.lite.examples.classification;
+package org.tensorflow.lite.examples.classification;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -42,8 +42,6 @@ import org.tensorflow.lite.support.image.ops.ResizeWithCropOrPadOp;
 import org.tensorflow.lite.support.image.ops.Rot90Op;
 import org.tensorflow.lite.support.label.TensorLabel;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
-
-import com.tensorflow.lite.examples.classification.Classifier.Device;
 
 /** A classifier specialized to label images using TensorFlow Lite. */
 public abstract class Classifier {

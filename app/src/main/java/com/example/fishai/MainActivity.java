@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.hardware.camera2.CameraCharacteristics;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -27,9 +28,15 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.examples.java.common.helpers.CameraPermissionHelper;
 import com.google.ar.core.examples.java.helloar.HelloArActivity;
-import com.tensorflow.lite.examples.classification.Classifier;
-import com.tensorflow.lite.examples.classification.ClassifierFloatMobileNet;
-import com.tensorflow.lite.examples.classification.ClassifierQuantizedMobileNet;
+
+import org.tensorflow.lite.examples.classification.Classifier;
+import org.tensorflow.lite.examples.classification.ClassifierFloatMobileNet;
+
+import org.tensorflow.lite.support.image.ImageProcessor;
+import org.tensorflow.lite.support.image.TensorImage;
+import org.tensorflow.lite.support.image.ops.ResizeOp;
+import org.tensorflow.lite.support.image.ops.ResizeWithCropOrPadOp;
+import org.tensorflow.lite.support.image.ops.Rot90Op;
 
 import java.io.IOException;
 import java.util.List;
@@ -201,8 +208,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void openCamera() {
         // Start Activity to take photos with the Phone's Camera
-        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(cameraIntent, CAMERA_REQUEST);
+//        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+//        startActivityForResult(cameraIntent, CAMERA_REQUEST);
+//        Intent cameraIntent = new Intent(this, CameraActivity.class);
+//        startActivity(cameraIntent);
     }
 
     public void openMeasure() {
@@ -229,21 +238,68 @@ public class MainActivity extends AppCompatActivity {
             // Currently for Debug purposes
             // Displays the image as the background of the main application screen
             ImageView imageView = findViewById(R.id.image_view);
-            imageView.setImageBitmap(image);
+//            imageView.setImageBitmap(image);
 
             try {
-                Classifier classifier = new ClassifierQuantizedMobileNet(this, Classifier.Device.NNAPI, 1);
+                Classifier classifier = new ClassifierFloatMobileNet(this, Classifier.Device.NNAPI, 1);
                 List<Classifier.Recognition> results = classifier.recognizeImage(image, 0);
                 TextView textView = findViewById(R.id.textView);
                 int counter = 1;
                 textView.setText("Results: \n");
                 for (Classifier.Recognition result : results) {
-                    textView.append(counter++ + ": " + result.getId() + " " + result.getConfidence() + "\n");
+                    textView.append(counter++ + ": " + result.toString() + "\n");
                 }
+                imageView.setImageBitmap(loadImage(image, 0, classifier).getBitmap());
                 classifier.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    private int sensorToDeviceRotation(CameraCharacteristics c, int deviceOrientation) {
+        int sensorOrientation = c.get(CameraCharacteristics.SENSOR_ORIENTATION);
+
+        // Get device orientation in degrees
+        switch(deviceOrientation) {
+            case 0:
+                deviceOrientation = 0;
+                break;
+            case 1:
+                deviceOrientation = 90;
+                break;
+            case 2:
+                deviceOrientation = 180;
+                break;
+            case 3:
+                deviceOrientation = 270;
+                break;
+        }
+        // Reverse device orientation for front-facing cameras
+        if (c.get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_FRONT) {
+            deviceOrientation = -deviceOrientation;
+        }
+
+        // Calculate desired JPEG orientation relative to camera orientation to make
+        // the image upright relative to the device orientation
+        return (sensorOrientation + deviceOrientation + 360) % 360;
+    }
+
+    /** Loads input image, and applies preprocessing. */
+    private TensorImage loadImage(final Bitmap bitmap, int sensorOrientation, Classifier classifier) {
+        // Loads bitmap into a TensorImage.
+        TensorImage inputImageBuffer = new TensorImage();
+        inputImageBuffer.load(bitmap);
+
+        // Creates processor for the TensorImage.
+        int cropSize = Math.min(bitmap.getWidth(), bitmap.getHeight());
+        int numRotation = sensorOrientation / 90;
+        ImageProcessor imageProcessor =
+                new ImageProcessor.Builder()
+                        .add(new ResizeWithCropOrPadOp(cropSize, cropSize))
+                        .add(new ResizeOp(classifier.getImageSizeX(), classifier.getImageSizeY(), ResizeOp.ResizeMethod.NEAREST_NEIGHBOR))
+                        .add(new Rot90Op(numRotation))
+                        .build();
+        return imageProcessor.process(inputImageBuffer);
     }
 }
