@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "577057030654",
+    "firebase_url": "https://fishdotai-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "fishdotai",
+    "storage_bucket": "fishdotai.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:577057030654:android:2b7b7aff1313b74f42c0af",
+        "android_client_info": {
+          "package_name": "com.example.fishai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "577057030654-dvvt2mim3pbo2gi8to73k3ub35o20j5k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClFcf2tq2rtWvGeTyaqdAOB_J8DLjTSow"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "577057030654-dvvt2mim3pbo2gi8to73k3ub35o20j5k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.camera2.CameraCharacteristics;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.Menu;
@@ -18,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -28,9 +32,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.examples.java.common.helpers.CameraPermissionHelper;
 import com.google.ar.core.examples.java.helloar.HelloArActivity;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.tensorflow.lite.examples.classification.Classifier;
 import org.tensorflow.lite.examples.classification.ClassifierFloatMobileNet;
+import org.tensorflow.lite.examples.classification.ClassifierQuantizedMobileNet;
 
 import org.tensorflow.lite.support.image.ImageProcessor;
 import org.tensorflow.lite.support.image.TensorImage;
@@ -38,17 +44,31 @@ import org.tensorflow.lite.support.image.ops.ResizeOp;
 import org.tensorflow.lite.support.image.ops.ResizeWithCropOrPadOp;
 import org.tensorflow.lite.support.image.ops.Rot90Op;
 
+import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
+import android.util.Log;
+
 public class MainActivity extends AppCompatActivity {
+//    private static final String TAG = MainActivity.class.getSimpleName();
+
     Bitmap image;
     private static final int CAMERA_REQUEST = 1888;
+    private static final int IMAGE_CAPTURE_REQUEST = 1890;
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
 
     private static final int TIME_DELAY = 2000;
     private static long back_pressed;
+
+    private String currentPhotoPath;
+    private String pathToPicture;
+    private final String sailfish = "app/src/main/assets/pictures/sailfish.jpg";
+
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +145,10 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         else if (id == R.id.action_test) {
+            return true;
+        }
+        else if (id == R.id.action_about) {
+            // TODO: Display ABOUT page
             return true;
         }
 
@@ -210,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
         // Start Activity to take photos with the Phone's Camera
 //        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
 //        startActivityForResult(cameraIntent, CAMERA_REQUEST);
+        dispatchTakePictureIntent();
 //        Intent cameraIntent = new Intent(this, CameraActivity.class);
 //        startActivity(cameraIntent);
     }
@@ -233,28 +258,76 @@ public class MainActivity extends AppCompatActivity {
         // When the camera image capture activity concludes
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             // Extract the image data from the activity results
-            image = (Bitmap) data.getExtras().get("data");
-
+//            image = (Bitmap) data.getExtras().get("data");
+            image = BitmapFactory.decodeFile(currentPhotoPath);
             // Currently for Debug purposes
             // Displays the image as the background of the main application screen
-            ImageView imageView = findViewById(R.id.image_view);
+//            ImageView imageView = findViewById(R.id.image_view);
 //            imageView.setImageBitmap(image);
-
             try {
                 Classifier classifier = new ClassifierFloatMobileNet(this, Classifier.Device.NNAPI, 1);
-                List<Classifier.Recognition> results = classifier.recognizeImage(image, 0);
+//                Classifier classifier = new ClassifierQuantizedMobileNet(this, Classifier.Device.NNAPI, 1);
+                List<Classifier.Recognition> results = classifier.recognizeImage(image, 270);
                 TextView textView = findViewById(R.id.textView);
                 int counter = 1;
                 textView.setText("Results: \n");
                 for (Classifier.Recognition result : results) {
                     textView.append(counter++ + ": " + result.toString() + "\n");
                 }
-                imageView.setImageBitmap(loadImage(image, 0, classifier).getBitmap());
+                ImageView imageView = findViewById(R.id.image_view);
+                imageView.setImageBitmap(loadImage(image, 270, classifier).getBitmap());
                 classifier.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        else if (requestCode == IMAGE_CAPTURE_REQUEST && resultCode == Activity.RESULT_OK) {
+            pathToPicture = currentPhotoPath;
+            ImageView imageView = findViewById(R.id.image_view);
+            imageView.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath));
+            TextView textView = findViewById(R.id.textView);
+            textView.setText("Photo created successfully: " + getExternalFilesDir(currentPhotoPath));
+        }
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+                photoFile.deleteOnExit();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                ex.printStackTrace();
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, photoURI);
+//                startActivityForResult(takePictureIntent, IMAGE_CAPTURE_REQUEST);
+                startActivityForResult(takePictureIntent, CAMERA_REQUEST);
+            }
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 
     private int sensorToDeviceRotation(CameraCharacteristics c, int deviceOrientation) {
