@@ -291,9 +291,10 @@ public abstract class Classifier {
         // TODO(b/143564309): Fuse ops inside ImageProcessor.
         ImageProcessor imageProcessor =
                 new ImageProcessor.Builder()
+// Currently squashing input image! Uncomment this line to crop the image instead
                         .add(new ResizeWithCropOrPadOp(cropSize, cropSize))
                         .add(new ResizeOp(imageSizeX, imageSizeY, ResizeMethod.NEAREST_NEIGHBOR))
-                        .add(new Rot90Op(numRotation))
+                        .add(new Rot90Op(-numRotation))
                         .add(getPreprocessNormalizeOp())
                         .build();
         return imageProcessor.process(inputImageBuffer);

@@ -19,16 +19,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentOnAttachListener;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.fishai.databinding.ActivityMainBinding;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.examples.java.common.helpers.CameraPermissionHelper;
 import com.google.ar.core.examples.java.helloar.HelloArActivity;
@@ -58,17 +65,23 @@ public class MainActivity extends AppCompatActivity {
     Bitmap image;
     private static final int CAMERA_REQUEST = 1888;
     private static final int IMAGE_CAPTURE_REQUEST = 1890;
+    private static final int TIME_DELAY = 2000;
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
 
-    private static final int TIME_DELAY = 2000;
+
     private static long back_pressed;
+    private boolean arEnabled = false;
+    private boolean cameraEnabled = false;
 
     private String currentPhotoPath;
-    private String pathToPicture;
-    private final String sailfish = "app/src/main/assets/pictures/sailfish.jpg";
+    private final String sailfish = "pictures/sailfish.jpg";
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    NavController navController;
+    ImageView imageView;
+    TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,40 +92,61 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar);
 
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
+        navController = navHostFragment.getNavController();
+//        navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openCamera();
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav);
+        NavigationUI.setupWithNavController(bottomNavigationView, navController);
+
+         imageView = findViewById(R.id.result_image);
+         textView = findViewById(R.id.textView);
+
+
+
+//         Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
-            }
-        });
+
 
         // Enable AR-related functionality on ARCore supported devices only.
         if (maybeEnableArButton()) {
-            Button button = findViewById(R.id.button_measure);
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    openMeasure();
-                }
-            });
+            arEnabled = true;
         }
 
         // Enable Camera related functionality on devices with accessible cameras only.
         if (maybeEnableCameraButton()) {
-            Button button = findViewById(R.id.button_measure);
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    openMeasure();
-                }
-            });
+            cameraEnabled = true;
         }
+
+        bottomNavigationView.setOnItemSelectedListener( item -> {
+            switch (item.getItemId()) {
+                case R.id.fish_identify:
+                    openCamera();
+                    break;
+                case R.id.fish_measure:
+                    openMeasure();
+                    break;
+                default:
+                    break;
+            }
+            return true;
+        });
+
+        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
+            @Override
+            public void onDestinationChanged(@NonNull NavController controller,
+                                             @NonNull NavDestination destination, @Nullable Bundle arguments) {
+                if(destination.getId() == R.id.FirstFragment) {
+//                    showFab(true);
+                    bottomNavigationView.setVisibility(View.VISIBLE);
+                } else {
+//                    showFab(false);
+                    bottomNavigationView.setVisibility(View.GONE);
+                }
+            }
+        });
     }
 
     @Override
@@ -122,9 +156,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() { super.onResume(); }
 
     @Override
-    public void onPause() {
-        super.onPause();
-    }
+    public void onPause() { super.onPause(); }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -164,34 +196,42 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // If the user double taps the back button, the application will close
-        if (back_pressed + TIME_DELAY > System.currentTimeMillis()) {
-            super.onBackPressed();
-        } else {
-            Toast.makeText(getBaseContext(), "Press once again to exit!",
-                    Toast.LENGTH_SHORT).show();
+//        navController.navigateUp();
+        // If the user is currently on the home screen
+        if (navController.getCurrentDestination().getId() == R.id.FirstFragment) {
+            // If the user double taps the back button, the application will close
+            if (back_pressed + TIME_DELAY > System.currentTimeMillis()) {
+                super.onBackPressed();
+            } else {
+                Toast.makeText(getBaseContext(), "Press once again to exit!",
+                        Toast.LENGTH_SHORT).show();
+            }
+            back_pressed = System.currentTimeMillis();
         }
-        back_pressed = System.currentTimeMillis();
     }
 
     private boolean maybeEnableCameraButton() {
-        FloatingActionButton button = findViewById(R.id.fab);
+        BottomNavigationView bottomNavView = findViewById(R.id.bottom_nav);
+        Menu nav_Menu = bottomNavView.getMenu();
+
         // Test to see if the device has an available camera to leverage
         if (this.getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)){
             // This device has a camera, so enable the camera functionality
-            button.setVisibility(View.VISIBLE);
-            button.setEnabled(true);
+//            showFab(true);
+            nav_Menu.findItem(R.id.fish_identify).setVisible(true);
             return true;
         } else {
             // No camera on this device, so disable the camera functionality
-            button.setVisibility(View.INVISIBLE);
-            button.setEnabled(false);
+            nav_Menu.findItem(R.id.fish_identify).setVisible(false);
             return false;
         }
     }
 
     private boolean maybeEnableArButton() {
-        Button button = findViewById(R.id.button_measure);
+        BottomNavigationView bottomNavView = findViewById(R.id.bottom_nav);
+        Menu nav_Menu = bottomNavView.getMenu();
+
+        // Query availability of AR functionality on host device
         ArCoreApk.Availability availability = ArCoreApk.getInstance().checkAvailability(this);
         if (availability.isTransient()) {
             // Continue to query availability at 5Hz while compatibility is checked in the background.
@@ -204,14 +244,12 @@ public class MainActivity extends AppCompatActivity {
         }
         if (availability.isSupported()) {
             // Enable AR functionality
-                button.setVisibility(View.VISIBLE);
-                button.setEnabled(true);
+                nav_Menu.findItem(R.id.fish_measure).setVisible(true);
                 return true;
         } else {
             // The device is unsupported or unknown.
             // AR not supported
-            button.setVisibility(View.INVISIBLE);
-            button.setEnabled(false);
+            nav_Menu.findItem(R.id.fish_measure).setVisible(false);
             return false;
        }
     }
@@ -245,10 +283,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(measureFish);
     }
 
-    public void openMLEngine(Bitmap image) {
+    public void openMLEngine(String path) {
         // Start Activity to identify fish with the TensorFlow Lite ML Engine
-//        Intent MLIntent = new Intent(this, TBA.class);
-//        startActivity(MLIntent);
+        Intent MLIntent = new Intent(this, ResultsActivity.class);
+        MLIntent.putExtra("path", path);
+        startActivity(MLIntent);
     }
 
 
@@ -258,35 +297,40 @@ public class MainActivity extends AppCompatActivity {
         // When the camera image capture activity concludes
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             // Extract the image data from the activity results
-//            image = (Bitmap) data.getExtras().get("data");
-            image = BitmapFactory.decodeFile(currentPhotoPath);
-            // Currently for Debug purposes
-            // Displays the image as the background of the main application screen
-//            ImageView imageView = findViewById(R.id.image_view);
+//            Bitmap image = (Bitmap) data.getExtras().get("data");
+//            Uri path = (Uri) data.getExtras().get("data");
+//            image = BitmapFactory.decodeFile(currentPhotoPath);
+
+            // Navigate to results page
+//            openMLEngine(image);
+            openMLEngine(currentPhotoPath);
+
+
+//            Intent identifyFish = new Intent(this, ResultsActivity.class);
+//            identifyFish.putExtra("path", path);
+//            startActivity(identifyFish);
+//            navController.navigate(R.id.action_FirstFragment_to_ResultsFragment);
+
+//            ImageView imageView = (ImageView) findViewById(R.id.result_image);
+//            ImageView imageView = findViewById(R.id.result_image);
+
 //            imageView.setImageBitmap(image);
-            try {
-                Classifier classifier = new ClassifierFloatMobileNet(this, Classifier.Device.NNAPI, 1);
-//                Classifier classifier = new ClassifierQuantizedMobileNet(this, Classifier.Device.NNAPI, 1);
-                List<Classifier.Recognition> results = classifier.recognizeImage(image, 270);
-                TextView textView = findViewById(R.id.textView);
-                int counter = 1;
-                textView.setText("Results: \n");
-                for (Classifier.Recognition result : results) {
-                    textView.append(counter++ + ": " + result.toString() + "\n");
-                }
-                ImageView imageView = findViewById(R.id.image_view);
-                imageView.setImageBitmap(loadImage(image, 270, classifier).getBitmap());
-                classifier.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+//            TextView textView = findViewById(R.id.textView);
+
+//            int counter = 1;
+//            textView.setText("Results: \n");
+/*            for (Classifier.Recognition result : results) {
+                textView.append(counter++ + ": " + result.toString() + "\n");
             }
+*/
         }
         else if (requestCode == IMAGE_CAPTURE_REQUEST && resultCode == Activity.RESULT_OK) {
-            pathToPicture = currentPhotoPath;
-            ImageView imageView = findViewById(R.id.image_view);
+/*            pathToPicture = currentPhotoPath;
+            ImageView imageView = findViewById(R.id.result_image);
             imageView.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath));
             TextView textView = findViewById(R.id.textView);
             textView.setText("Photo created successfully: " + getExternalFilesDir(currentPhotoPath));
+*/
         }
     }
 
@@ -314,6 +358,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -375,4 +420,12 @@ public class MainActivity extends AppCompatActivity {
                         .build();
         return imageProcessor.process(inputImageBuffer);
     }
+/*
+    private void showFab(boolean bool) {
+        if (bool) {
+            binding.fab.setVisibility(View.VISIBLE);
+        } else
+            binding.fab.setVisibility(View.INVISIBLE);
+    }
+*/
 }

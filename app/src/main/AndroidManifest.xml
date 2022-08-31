@@ -34,6 +34,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <activity
+            android:name="com.example.fishai.ResultsActivity"
+            android:label="Fish.Identify"
+            android:theme="@style/Theme.FishAI.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
+
         <!-- "AR Required" app, requires "Google Play Services for AR" (ARCore)
             to be installed, as the app does not include any non-AR features. -->
 <!--        <meta-data android:name="com.google.ar.core" android:value="required" /> -->
