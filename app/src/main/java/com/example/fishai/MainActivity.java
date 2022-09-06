@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.hardware.camera2.CameraCharacteristics;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,8 +21,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentOnAttachListener;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
@@ -41,41 +37,25 @@ import com.google.ar.core.examples.java.common.helpers.CameraPermissionHelper;
 import com.google.ar.core.examples.java.helloar.HelloArActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import org.tensorflow.lite.examples.classification.Classifier;
-import org.tensorflow.lite.examples.classification.ClassifierFloatMobileNet;
-import org.tensorflow.lite.examples.classification.ClassifierQuantizedMobileNet;
-
-import org.tensorflow.lite.support.image.ImageProcessor;
-import org.tensorflow.lite.support.image.TensorImage;
-import org.tensorflow.lite.support.image.ops.ResizeOp;
-import org.tensorflow.lite.support.image.ops.ResizeWithCropOrPadOp;
-import org.tensorflow.lite.support.image.ops.Rot90Op;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
-import android.util.Log;
 
 public class MainActivity extends AppCompatActivity {
 //    private static final String TAG = MainActivity.class.getSimpleName();
 
-    Bitmap image;
     private static final int CAMERA_REQUEST = 1888;
-    private static final int IMAGE_CAPTURE_REQUEST = 1890;
     private static final int TIME_DELAY = 2000;
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
-
 
     private static long back_pressed;
     private boolean arEnabled = false;
     private boolean cameraEnabled = false;
 
     private String currentPhotoPath;
-    private final String sailfish = "pictures/sailfish.jpg";
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -103,12 +83,6 @@ public class MainActivity extends AppCompatActivity {
 
          imageView = findViewById(R.id.result_image);
          textView = findViewById(R.id.textView);
-
-
-
-//         Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-
 
         // Enable AR-related functionality on ARCore supported devices only.
         if (maybeEnableArButton()) {
@@ -273,8 +247,6 @@ public class MainActivity extends AppCompatActivity {
 //        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
 //        startActivityForResult(cameraIntent, CAMERA_REQUEST);
         dispatchTakePictureIntent();
-//        Intent cameraIntent = new Intent(this, CameraActivity.class);
-//        startActivity(cameraIntent);
     }
 
     public void openMeasure() {
@@ -296,41 +268,9 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         // When the camera image capture activity concludes
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
-            // Extract the image data from the activity results
-//            Bitmap image = (Bitmap) data.getExtras().get("data");
-//            Uri path = (Uri) data.getExtras().get("data");
-//            image = BitmapFactory.decodeFile(currentPhotoPath);
-
             // Navigate to results page
 //            openMLEngine(image);
             openMLEngine(currentPhotoPath);
-
-
-//            Intent identifyFish = new Intent(this, ResultsActivity.class);
-//            identifyFish.putExtra("path", path);
-//            startActivity(identifyFish);
-//            navController.navigate(R.id.action_FirstFragment_to_ResultsFragment);
-
-//            ImageView imageView = (ImageView) findViewById(R.id.result_image);
-//            ImageView imageView = findViewById(R.id.result_image);
-
-//            imageView.setImageBitmap(image);
-//            TextView textView = findViewById(R.id.textView);
-
-//            int counter = 1;
-//            textView.setText("Results: \n");
-/*            for (Classifier.Recognition result : results) {
-                textView.append(counter++ + ": " + result.toString() + "\n");
-            }
-*/
-        }
-        else if (requestCode == IMAGE_CAPTURE_REQUEST && resultCode == Activity.RESULT_OK) {
-/*            pathToPicture = currentPhotoPath;
-            ImageView imageView = findViewById(R.id.result_image);
-            imageView.setImageBitmap(BitmapFactory.decodeFile(currentPhotoPath));
-            TextView textView = findViewById(R.id.textView);
-            textView.setText("Photo created successfully: " + getExternalFilesDir(currentPhotoPath));
-*/
         }
     }
 
@@ -375,7 +315,7 @@ public class MainActivity extends AppCompatActivity {
         return image;
     }
 
-    private int sensorToDeviceRotation(CameraCharacteristics c, int deviceOrientation) {
+/*    private int sensorToDeviceRotation(CameraCharacteristics c, int deviceOrientation) {
         int sensorOrientation = c.get(CameraCharacteristics.SENSOR_ORIENTATION);
 
         // Get device orientation in degrees
@@ -402,30 +342,6 @@ public class MainActivity extends AppCompatActivity {
         // the image upright relative to the device orientation
         return (sensorOrientation + deviceOrientation + 360) % 360;
     }
-
-    /** Loads input image, and applies preprocessing. */
-    private TensorImage loadImage(final Bitmap bitmap, int sensorOrientation, Classifier classifier) {
-        // Loads bitmap into a TensorImage.
-        TensorImage inputImageBuffer = new TensorImage();
-        inputImageBuffer.load(bitmap);
-
-        // Creates processor for the TensorImage.
-        int cropSize = Math.min(bitmap.getWidth(), bitmap.getHeight());
-        int numRotation = sensorOrientation / 90;
-        ImageProcessor imageProcessor =
-                new ImageProcessor.Builder()
-                        .add(new ResizeWithCropOrPadOp(cropSize, cropSize))
-                        .add(new ResizeOp(classifier.getImageSizeX(), classifier.getImageSizeY(), ResizeOp.ResizeMethod.NEAREST_NEIGHBOR))
-                        .add(new Rot90Op(numRotation))
-                        .build();
-        return imageProcessor.process(inputImageBuffer);
-    }
-/*
-    private void showFab(boolean bool) {
-        if (bool) {
-            binding.fab.setVisibility(View.VISIBLE);
-        } else
-            binding.fab.setVisibility(View.INVISIBLE);
-    }
 */
+
 }

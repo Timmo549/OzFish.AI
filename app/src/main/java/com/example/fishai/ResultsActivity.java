@@ -159,7 +159,7 @@ public class ResultsActivity extends AppCompatActivity {
         int numRotation = sensorOrientation / 90;
         ImageProcessor imageProcessor =
                 new ImageProcessor.Builder()
-// Currently squashing input image! Uncomment this line to crop the image instead
+        // Currently squashing input image! Uncomment this line to crop the image instead
                         .add(new ResizeWithCropOrPadOp(cropSize, cropSize))
                         .add(new ResizeOp(classifier.getImageSizeX(), classifier.getImageSizeY(), ResizeOp.ResizeMethod.NEAREST_NEIGHBOR))
                         .add(new Rot90Op(-numRotation))
