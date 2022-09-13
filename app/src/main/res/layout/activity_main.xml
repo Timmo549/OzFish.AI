@@ -22,6 +22,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <include layout="@layout/content_main" />
+
 <!--    <androidx.fragment.app.FragmentContainerView
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/fragment_container_view"
@@ -37,10 +38,11 @@
         android:layout_marginBottom="80dp"
         app:srcCompat="@android:drawable/ic_menu_camera" />
 -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
+<!--    <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
         android:layout_gravity="bottom"
         app:menu="@menu/menu_bottom_nav" />
+-->
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

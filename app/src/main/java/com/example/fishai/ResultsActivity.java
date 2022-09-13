@@ -1,6 +1,8 @@
 package com.example.fishai;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
@@ -12,6 +14,8 @@ import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.fishai.databinding.ActivityMainBinding;
 import com.example.fishai.databinding.ResultsActivityBinding;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.tensorflow.lite.examples.classification.Classifier;
 import org.tensorflow.lite.examples.classification.ClassifierFloatMobileNet;
@@ -37,7 +42,10 @@ public class ResultsActivity extends AppCompatActivity {
 
 //    Bitmap image;
     private ResultsActivityBinding binding;
+    private int counter;
+    private String fishName;
 
+    private List<Classifier.Recognition> results;
 
     @SuppressLint("WrongThread")
     @Override
@@ -56,8 +64,11 @@ public class ResultsActivity extends AppCompatActivity {
 //        TextView textView = findViewById(R.id.textView);
 //        textView.setText("Extras: " + pathToPicture);
 
-        Bitmap image = BitmapFactory.decodeFile(pathToPicture);
-/*
+//        Bitmap image = BitmapFactory.decodeFile(pathToPicture);
+
+
+
+
         // Code for testing with sailfish image (or subsequently any image within the asset folder)
         ImageDecoder.Source source = ImageDecoder.createSource(getAssets(), "pictures/sailfish.jpg");
 
@@ -75,20 +86,69 @@ public class ResultsActivity extends AppCompatActivity {
         }
 
         image.setConfig(Bitmap.Config.ARGB_8888);
-*/
+
+
+
+
+
+
+        TextView fishNameView = findViewById(R.id.fish_name_text);
+
+        binding.buttonResultsYes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openFishInformation();
+            }
+        });
+
+        binding.buttonResultsNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Expected counter range = 0-2
+                if (counter < 2) {
+                    counter++;
+                    fishName = results.get(counter).getTitle();
+                    fishNameView.setText(fishName);
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ResultsActivity.this);
+                    builder.setMessage(R.string.results_error_message).setPositiveButton(R.string.results_error_okay, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int id) {
+                            navigateUpTo(getSupportParentActivityIntent());
+                        }
+                    });
+                    builder.create().show();
+                }
+            }
+        });
+
         if (image != null) {
             ImageView imageView = findViewById(R.id.result_image);
             imageView.setImageBitmap(rotateBitmap(image,90));
 
-            performClassification(image);
+            results = performClassification(image);
+
+            if (results != null) {
+                counter = 0;
+                fishName = results.get(counter).getTitle();
+                fishNameView.setText(fishName);
+            }
         } else {
-            TextView textView = findViewById(R.id.textView);
+            TextView textView = findViewById(R.id.debug_text);
             textView.setText("Couldn't find Bitmap");
         }
+
+
+
+
+    }
+
+    protected void nextFish() {
+
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
     }
 
@@ -100,6 +160,13 @@ public class ResultsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    protected void openFishInformation() {
+        // Start Activity to display fish results based on identified fish
+        Intent informationIntent = new Intent(ResultsActivity.this, InformationActivity.class);
+        informationIntent.putExtra("fishName", fishName);
+        startActivity(informationIntent);
     }
 
     @Override
@@ -119,12 +186,12 @@ public class ResultsActivity extends AppCompatActivity {
 */
     }
 
-    protected void performClassification(Bitmap image) {
+    protected List<Classifier.Recognition> performClassification(Bitmap image) {
         try {
             Classifier classifier = new ClassifierFloatMobileNet(this, Classifier.Device.NNAPI, 1);
             List<Classifier.Recognition> results = classifier.recognizeImage(image, 90);
 
-                TextView textView = findViewById(R.id.textView);
+                TextView textView = findViewById(R.id.debug_text);
                 int counter = 1;
                 textView.setText("Results: \n");
                 for (Classifier.Recognition result : results) {
@@ -136,9 +203,12 @@ public class ResultsActivity extends AppCompatActivity {
 //                image = loadImage(image, 270, classifier).getBitmap();
 
             classifier.close();
+
+            return results;
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     public static Bitmap rotateBitmap(Bitmap source, float angle)

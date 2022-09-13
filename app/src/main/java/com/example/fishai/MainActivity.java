@@ -1,19 +1,25 @@
 package com.example.fishai;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.hardware.camera2.CameraCharacteristics;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,8 +36,6 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.fishai.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.navigation.NavigationBarView;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.examples.java.common.helpers.CameraPermissionHelper;
 import com.google.ar.core.examples.java.helloar.HelloArActivity;
@@ -39,6 +43,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -56,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean cameraEnabled = false;
 
     private String currentPhotoPath;
+    private String fishToSearch;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -78,8 +84,8 @@ public class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav);
-        NavigationUI.setupWithNavController(bottomNavigationView, navController);
+//        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav);
+//        NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
          imageView = findViewById(R.id.result_image);
          textView = findViewById(R.id.textView);
@@ -87,13 +93,77 @@ public class MainActivity extends AppCompatActivity {
         // Enable AR-related functionality on ARCore supported devices only.
         if (maybeEnableArButton()) {
             arEnabled = true;
+
+            Button measure_button = findViewById(R.id.measure_button);
+            measure_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    openMeasure();
+                }
+            });
         }
 
         // Enable Camera related functionality on devices with accessible cameras only.
         if (maybeEnableCameraButton()) {
             cameraEnabled = true;
+
+            Button camera_button = findViewById(R.id.identify_button);
+            camera_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    openCamera();
+                }
+            });
         }
 
+        Button search_button = findViewById(R.id.search_button);
+        search_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                View searchView = getLayoutInflater().inflate(R.layout.search_spinner_menu, null);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setView(searchView);
+                builder.setMessage("Select the fish species to view...");
+                builder.setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int id) {
+                        openSearch(fishToSearch);
+                    }
+                });
+                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+
+                Spinner spinner = searchView.findViewById(R.id.search_spinner);
+
+                ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(dialog.getContext(), R.array.fish_dataset, android.R.layout.simple_spinner_item);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                spinner.setAdapter(adapter);
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        // An item was selected. You can retrieve the selected item using
+                        // parent.getItemAtPosition(pos)
+                        fishToSearch = String.valueOf(adapterView.getItemAtPosition(i));
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+                        // Another interface callback
+                    }
+                });
+                dialog.show();
+            }
+        });
+
+/*
         bottomNavigationView.setOnItemSelectedListener( item -> {
             switch (item.getItemId()) {
                 case R.id.fish_identify:
@@ -121,7 +191,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+*/
     }
+
 
     @Override
     protected void onDestroy() { super.onDestroy(); }
@@ -154,7 +226,23 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         else if (id == R.id.action_about) {
-            // TODO: Display ABOUT page
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setMessage(
+                    "Authors:" +
+                    "\nTeam Coordinator - Jie Liu" +
+                    "\nLead Programmer/Tester - Timothy Carroll" +
+                    "\nAI Specialist - Can Liu" +
+                    "\nAI Specialist - Wei Guo" +
+                    "\nDatabase Designer - Hancheng Cai" +
+                    "\nData Collector - Haoran Ouang" +
+                    "\n\nDeveloped in 2022 for the University of Wollongong"
+                    ).setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int id) {
+                    dialogInterface.dismiss();
+                }
+            });
+            builder.create().show();
             return true;
         }
 
@@ -185,25 +273,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean maybeEnableCameraButton() {
-        BottomNavigationView bottomNavView = findViewById(R.id.bottom_nav);
-        Menu nav_Menu = bottomNavView.getMenu();
+//        BottomNavigationView bottomNavView = findViewById(R.id.bottom_nav);
+//        Menu nav_Menu = bottomNavView.getMenu();
+
+        Button camera_button = findViewById(R.id.identify_button);
 
         // Test to see if the device has an available camera to leverage
         if (this.getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)){
             // This device has a camera, so enable the camera functionality
 //            showFab(true);
-            nav_Menu.findItem(R.id.fish_identify).setVisible(true);
+            camera_button.setEnabled(true);
+//            nav_Menu.findItem(R.id.fish_identify).setVisible(true);
             return true;
         } else {
             // No camera on this device, so disable the camera functionality
-            nav_Menu.findItem(R.id.fish_identify).setVisible(false);
+            camera_button.setEnabled(false);
+//            nav_Menu.findItem(R.id.fish_identify).setVisible(false);
             return false;
         }
     }
 
     private boolean maybeEnableArButton() {
-        BottomNavigationView bottomNavView = findViewById(R.id.bottom_nav);
-        Menu nav_Menu = bottomNavView.getMenu();
+//        BottomNavigationView bottomNavView = findViewById(R.id.bottom_nav);
+//        Menu nav_Menu = bottomNavView.getMenu();
+
+        Button measure_button = findViewById(R.id.measure_button);
 
         // Query availability of AR functionality on host device
         ArCoreApk.Availability availability = ArCoreApk.getInstance().checkAvailability(this);
@@ -218,12 +312,14 @@ public class MainActivity extends AppCompatActivity {
         }
         if (availability.isSupported()) {
             // Enable AR functionality
-                nav_Menu.findItem(R.id.fish_measure).setVisible(true);
-                return true;
+            measure_button.setEnabled(true);
+            //nav_Menu.findItem(R.id.fish_measure).setVisible(true);
+            return true;
         } else {
             // The device is unsupported or unknown.
             // AR not supported
-            nav_Menu.findItem(R.id.fish_measure).setVisible(false);
+            measure_button.setEnabled(false);
+            //nav_Menu.findItem(R.id.fish_measure).setVisible(false);
             return false;
        }
     }
@@ -242,26 +338,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void openCamera() {
+    protected void openCamera() {
         // Start Activity to take photos with the Phone's Camera
 //        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
 //        startActivityForResult(cameraIntent, CAMERA_REQUEST);
         dispatchTakePictureIntent();
     }
 
-    public void openMeasure() {
+    protected void openMeasure() {
         // Start Activity to measure fish with the ARCore Engine
         Intent measureFish = new Intent(this, HelloArActivity.class);
         startActivity(measureFish);
     }
 
-    public void openMLEngine(String path) {
+    protected void openMLEngine(String path) {
         // Start Activity to identify fish with the TensorFlow Lite ML Engine
         Intent MLIntent = new Intent(this, ResultsActivity.class);
         MLIntent.putExtra("path", path);
         startActivity(MLIntent);
     }
 
+    private void openSearch(String fishName) {
+        Intent searchIntent = new Intent(this, InformationActivity.class);
+        searchIntent.putExtra("fishName", fishName);
+        startActivity(searchIntent);
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -293,7 +394,7 @@ public class MainActivity extends AppCompatActivity {
                         "com.example.android.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, photoURI);
-//                startActivityForResult(takePictureIntent, IMAGE_CAPTURE_REQUEST);
+                // TODO: remove deprecated function
                 startActivityForResult(takePictureIntent, CAMERA_REQUEST);
             }
         }

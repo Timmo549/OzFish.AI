@@ -38,4 +38,16 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <!-- Strings used for MainActivity Dialog -->
+    <string name="okay">Okay</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Strings used for ResultsActivity Dialog -->
+    <string name="results_error_message">Error: Fish unable to be identified, please try again</string>
+    <string name="results_error_okay">Okay</string>
+
+    <string-array name="fish_dataset">
+        <item>Sailfish</item>
+    </string-array>
+
 </resources>

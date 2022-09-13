@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/Theme.FishAI.AppBarOverlay"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/Theme.FishAI.PopupOverlay" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ImageView
+        android:id="@+id/result_image"
+        android:layout_width="234dp"
+        android:layout_height="247dp"
+        android:layout_marginStart="141dp"
+        android:layout_marginTop="104dp"
+        android:layout_marginEnd="142dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/fish_name_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="fishName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/result_image" />
+
+    <TableLayout
+        android:id="@+id/tableLayout"
+        android:layout_width="409dp"
+        android:layout_height="503dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="1dp"
+        android:stretchColumns="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fish_name_text">
+
+        <TableRow>
+            <TextView
+                android:layout_width="160dp"
+                android:gravity="end"
+                android:padding="3dip"
+                android:text="Fish Name: "
+                android:layout_column="0" />
+
+            <TextView
+                android:id="@+id/fish_name"
+                android:gravity="center"
+                android:padding="3dip"
+                android:text=""
+                android:layout_column="1" />
+        </TableRow>
+
+
+        <TableRow>
+            <TextView
+                android:layout_width="160dp"
+                android:gravity="end"
+                android:padding="3dip"
+                android:text="Bag Limit: "
+                android:layout_column="0" />
+
+            <TextView
+                android:id="@+id/bag_limit"
+                android:gravity="center"
+                android:padding="3dip"
+                android:text=""
+                android:layout_column="1" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:layout_width="160dp"
+                android:gravity="end"
+                android:padding="3dip"
+                android:text="Possession Limit: "
+                android:layout_column="0" />
+
+            <TextView
+                android:id="@+id/possession_limit"
+                android:gravity="center"
+                android:padding="3dip"
+                android:text=""
+                android:layout_column="1" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:layout_width="160dp"
+                android:gravity="end"
+                android:padding="3dip"
+                android:text="Minimum Size: "
+                android:layout_column="0" />
+
+            <TextView
+                android:id="@+id/minimum_size"
+                android:gravity="center"
+                android:padding="3dip"
+                android:text=""
+                android:layout_column="1" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:layout_width="160dp"
+
+                android:padding="3dip"
+                android:gravity="end"
+                android:text="Season: "
+                android:layout_column="0" />
+
+            <TextView
+                android:id="@+id/season"
+                android:gravity="center"
+                android:padding="3dip"
+                android:text=""
+                android:layout_column="1" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:layout_width="160dp"
+                android:gravity="end"
+                android:padding="3dip"
+                android:text="Freshwater? "
+                android:layout_column="0" />
+
+            <TextView
+                android:id="@+id/freshwater"
+                android:gravity="center"
+                android:padding="3dip"
+                android:text=""
+                android:layout_column="1" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:layout_width="160dp"
+                android:gravity="end"
+                android:padding="3dip"
+                android:text="Saltwater? "
+                android:layout_column="0" />
+
+            <TextView
+                android:id="@+id/saltwater"
+                android:gravity="center"
+                android:padding="3dip"
+                android:text=""
+                android:layout_column="1" />
+        </TableRow>
+    </TableLayout>
+
+    <TextView
+        android:id="@+id/debug_text"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="256dp"
+        android:layout_marginEnd="100dp"
+        android:elevation="5dp"
+        android:text="DEBUG TEXT"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fish_name_text" />
+</androidx.constraintlayout.widget.ConstraintLayout>

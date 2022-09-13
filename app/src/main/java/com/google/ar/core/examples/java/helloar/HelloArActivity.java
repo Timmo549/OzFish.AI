@@ -220,7 +220,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
     binding.toolbar.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        navigateUpTo(getParentActivityIntent());
+        navigateUpTo(getSupportParentActivityIntent());
       }
     });
 

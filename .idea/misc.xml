@@ -13,12 +13,15 @@
         <entry key="..\:/Users/Tim-PC/AndroidStudioProjects/FishAI/app/src/main/res/layout/activity_measure.xml" value="0.5541666666666667" />
         <entry key="..\:/Users/Tim-PC/AndroidStudioProjects/FishAI/app/src/main/res/layout/camera_activity.xml" value="0.31354166666666666" />
         <entry key="..\:/Users/Tim-PC/AndroidStudioProjects/FishAI/app/src/main/res/layout/content_main.xml" value="0.31354166666666666" />
-        <entry key="..\:/Users/Tim-PC/AndroidStudioProjects/FishAI/app/src/main/res/layout/fragment_first.xml" value="0.31354166666666666" />
+        <entry key="..\:/Users/Tim-PC/AndroidStudioProjects/FishAI/app/src/main/res/layout/dropdown_item.xml" value="0.4548952543822146" />
+        <entry key="..\:/Users/Tim-PC/AndroidStudioProjects/FishAI/app/src/main/res/layout/fragment_first.xml" value="0.2573749465583583" />
         <entry key="..\:/Users/Tim-PC/AndroidStudioProjects/FishAI/app/src/main/res/layout/fragment_measure.xml" value="0.33" />
         <entry key="..\:/Users/Tim-PC/AndroidStudioProjects/FishAI/app/src/main/res/layout/fragment_results.xml" value="0.2573749465583583" />
         <entry key="..\:/Users/Tim-PC/AndroidStudioProjects/FishAI/app/src/main/res/layout/fragment_second.xml" value="0.31354166666666666" />
         <entry key="..\:/Users/Tim-PC/AndroidStudioProjects/FishAI/app/src/main/res/layout/hello_ar_activity.xml" value="0.31354166666666666" />
+        <entry key="..\:/Users/Tim-PC/AndroidStudioProjects/FishAI/app/src/main/res/layout/information_activity.xml" value="0.2573749465583583" />
         <entry key="..\:/Users/Tim-PC/AndroidStudioProjects/FishAI/app/src/main/res/layout/results_activity.xml" value="0.2573749465583583" />
+        <entry key="..\:/Users/Tim-PC/AndroidStudioProjects/FishAI/app/src/main/res/layout/search_spinner_menu.xml" value="0.45404018811457886" />
         <entry key="..\:/Users/Tim-PC/AndroidStudioProjects/FishAI/app/src/main/res/menu/menu_arcore.xml" value="0.31354166666666666" />
         <entry key="..\:/Users/Tim-PC/AndroidStudioProjects/FishAI/app/src/main/res/menu/menu_bottom_nav.xml" value="0.2620778110303549" />
         <entry key="..\:/Users/Tim-PC/AndroidStudioProjects/FishAI/app/src/main/res/menu/menu_main.xml" value="0.31354166666666666" />
@@ -34,5 +37,12 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
+  </component>
+  <component name="VisualizationToolProject">
+    <option name="state">
+      <ProjectState>
+        <option name="scale" value="0.2573749465583583" />
+      </ProjectState>
+    </option>
   </component>
 </project>

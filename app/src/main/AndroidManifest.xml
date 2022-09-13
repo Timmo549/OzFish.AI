@@ -42,6 +42,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <activity
+            android:name="com.example.fishai.InformationActivity"
+            android:label="Fish.Info"
+            android:theme="@style/Theme.FishAI.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
 
 
         <!-- "AR Required" app, requires "Google Play Services for AR" (ARCore)
