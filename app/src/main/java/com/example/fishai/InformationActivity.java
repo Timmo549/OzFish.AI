@@ -1,6 +1,9 @@
 package com.example.fishai;
 
+import android.annotation.SuppressLint;
+import android.graphics.ImageDecoder;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,6 +20,7 @@ import com.google.firebase.firestore.Source;
 
 import org.w3c.dom.Text;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -26,6 +30,7 @@ public class InformationActivity extends AppCompatActivity {
 
     private Map<String, Object> document;
 
+    @SuppressLint("WrongThread")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +48,15 @@ public class InformationActivity extends AppCompatActivity {
 
         TextView textView = findViewById(R.id.fish_name_text);
         textView.setText(fishName);
+
+        ImageView fishPicture = findViewById(R.id.result_image);
+        String path = "pictures/" + fishName.toLowerCase() + ".jpg";
+
+        try {
+            fishPicture.setImageBitmap(ImageDecoder.decodeBitmap(ImageDecoder.createSource(getAssets(), path)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         getFishRecord(fishName);
 

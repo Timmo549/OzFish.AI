@@ -64,11 +64,11 @@ public class ResultsActivity extends AppCompatActivity {
 //        TextView textView = findViewById(R.id.textView);
 //        textView.setText("Extras: " + pathToPicture);
 
-//        Bitmap image = BitmapFactory.decodeFile(pathToPicture);
+        Bitmap image = BitmapFactory.decodeFile(pathToPicture);
 
 
 
-
+/*
         // Code for testing with sailfish image (or subsequently any image within the asset folder)
         ImageDecoder.Source source = ImageDecoder.createSource(getAssets(), "pictures/sailfish.jpg");
 
@@ -91,8 +91,9 @@ public class ResultsActivity extends AppCompatActivity {
 
 
 
-
+*/
         TextView fishNameView = findViewById(R.id.fish_name_text);
+        ImageView fishPicture = findViewById(R.id.result_image);
 
         binding.buttonResultsYes.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,6 +110,15 @@ public class ResultsActivity extends AppCompatActivity {
                     counter++;
                     fishName = results.get(counter).getTitle();
                     fishNameView.setText(fishName);
+
+                    String path = "pictures/" + fishName.toLowerCase() + ".jpg";
+
+                    try {
+                        fishPicture.setImageBitmap(ImageDecoder.decodeBitmap(ImageDecoder.createSource(getAssets(), path)));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                 } else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(ResultsActivity.this);
                     builder.setMessage(R.string.results_error_message).setPositiveButton(R.string.results_error_okay, new DialogInterface.OnClickListener() {
@@ -123,8 +133,8 @@ public class ResultsActivity extends AppCompatActivity {
         });
 
         if (image != null) {
-            ImageView imageView = findViewById(R.id.result_image);
-            imageView.setImageBitmap(rotateBitmap(image,90));
+//            ImageView imageView = findViewById(R.id.result_image);
+//            imageView.setImageBitmap(rotateBitmap(image,90));
 
             results = performClassification(image);
 
@@ -132,6 +142,14 @@ public class ResultsActivity extends AppCompatActivity {
                 counter = 0;
                 fishName = results.get(counter).getTitle();
                 fishNameView.setText(fishName);
+
+                String path = "pictures/" + fishName.toLowerCase() + ".jpg";
+
+                try {
+                    fishPicture.setImageBitmap(ImageDecoder.decodeBitmap(ImageDecoder.createSource(getAssets(), path)));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             TextView textView = findViewById(R.id.debug_text);

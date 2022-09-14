@@ -19,7 +19,8 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.FishAI.NoActionBar">
+            android:theme="@style/Theme.FishAI.NoActionBar"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,7 +38,8 @@
         <activity
             android:name="com.example.fishai.ResultsActivity"
             android:label="Fish.Identify"
-            android:theme="@style/Theme.FishAI.NoActionBar">
+            android:theme="@style/Theme.FishAI.NoActionBar"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
@@ -45,7 +47,8 @@
         <activity
             android:name="com.example.fishai.InformationActivity"
             android:label="Fish.Info"
-            android:theme="@style/Theme.FishAI.NoActionBar">
+            android:theme="@style/Theme.FishAI.NoActionBar"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
