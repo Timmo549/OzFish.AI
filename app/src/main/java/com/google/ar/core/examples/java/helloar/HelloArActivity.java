@@ -1156,37 +1156,14 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
           if (doc.exists()) {
             // Document found
             document = doc.getData();
-            populateFields();
-//                        TextView textView = findViewById(R.id.debug_text);
-//                        textView.setText("Document Found");
           } else {
             // Error, no document found
-//                        TextView textView = findViewById(R.id.debug_text);
-//                        textView.setText("Document Not Found");
           }
         } else {
           // Error, something went wrong
-//                    TextView textView = findViewById(R.id.debug_text);
-//                    textView.setText("Document Error");
         }
       }
     });
-  }
-
-  private void populateFields() {
-    if (document != null) {
-/*
-            name: String
-            minimum_size: Integer
- */
-/*
-      TextView textView = findViewById(R.id.fish_name_result);
-      textView.setText(String.valueOf(document.get("name")));
-
-      ImageView fishLength = findViewById(R.id.result_image);
-      String path = String.valueOf(document.get("photo"));
-*/
-    }
   }
 }
 

@@ -40,7 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:letterSpacing="0.01"
-        android:text="fishName"
+        android:text="@string/fish_name"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@color/white"
@@ -71,7 +71,7 @@
                 android:gravity="end"
                 android:letterSpacing="0.01"
                 android:padding="6dip"
-                android:text="Bag Limit: "
+                android:text="@string/bag_limit"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
 
@@ -97,7 +97,7 @@
                 android:gravity="end"
                 android:letterSpacing="0.01"
                 android:padding="6dip"
-                android:text="Possession Limit: "
+                android:text="@string/possession_limit"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
 
@@ -123,7 +123,7 @@
                 android:gravity="end"
                 android:letterSpacing="0.01"
                 android:padding="6dip"
-                android:text="Minimum Size: "
+                android:text="@string/minimum_size"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
 
@@ -150,7 +150,7 @@
                 android:gravity="end"
                 android:letterSpacing="0.01"
                 android:padding="6dip"
-                android:text="Season: "
+                android:text="@string/season"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
 
@@ -176,7 +176,7 @@
                 android:gravity="end"
                 android:letterSpacing="0.01"
                 android:padding="6dip"
-                android:text="Freshwater? "
+                android:text="@string/freshwater"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
 
@@ -202,7 +202,7 @@
                 android:gravity="end"
                 android:letterSpacing="0.01"
                 android:padding="6dip"
-                android:text="Saltwater? "
+                android:text="@string/saltwater"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
 
@@ -228,7 +228,7 @@
                 android:gravity="end"
                 android:letterSpacing="0.01"
                 android:padding="6dip"
-                android:text="Notes: "
+                android:text="@string/notes"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
 
@@ -253,7 +253,7 @@
         android:layout_marginTop="10dp"
         android:enabled="true"
         android:lineSpacingExtra="6dp"
-        android:text="Measure Fish"
+        android:text="@string/measure_button"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

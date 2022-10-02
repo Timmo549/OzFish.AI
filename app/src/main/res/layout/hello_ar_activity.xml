@@ -70,7 +70,7 @@
           android:paddingTop="16dp"
           android:paddingRight="16dp"
           android:paddingBottom="2dp"
-          android:text="RESULT"
+          android:text="@string/result"
           android:textColor="#ffffff"
           android:textSize="20sp"
           android:layout_column="0" />
@@ -87,7 +87,7 @@
           android:paddingTop="16dp"
           android:paddingRight="16dp"
           android:paddingBottom="2dp"
-          android:text="LEGAL SIZE?"
+          android:text="@string/legal_size"
           android:textColor="#ffffff"
           android:textSize="20sp"
           android:visibility="invisible" />
@@ -99,7 +99,6 @@
           android:id="@+id/tv_result"
           android:layout_width="wrap_content"
           android:layout_height="60dp"
-          android:layout_alignParentBottom="true"
           android:letterSpacing="0.01"
           android:lineSpacingExtra="6sp"
           android:paddingLeft="16dp"
@@ -115,7 +114,6 @@
           android:id="@+id/legal_size"
           android:layout_width="0dp"
           android:layout_height="match_parent"
-          android:layout_alignParentBottom="true"
           android:letterSpacing="0.01"
           android:lineSpacingExtra="6sp"
           android:paddingLeft="16dp"

@@ -143,9 +143,6 @@ public class ResultsActivity extends AppCompatActivity {
 
                 getFishRecord(fishName);
             }
-        } else {
-//            TextView textView = findViewById(R.id.debug_text);
-//            textView.setText("Couldn't find Bitmap");
         }
     }
 
@@ -212,17 +209,11 @@ public class ResultsActivity extends AppCompatActivity {
                         // Document found
                         document = doc.getData();
                         populateFields();
-//                        TextView textView = findViewById(R.id.debug_text);
-//                        textView.setText("Document Found");
                     } else {
                         // Error, no document found
-//                        TextView textView = findViewById(R.id.debug_text);
-//                        textView.setText("Document Not Found");
                     }
                 } else {
                     // Error, something went wrong
-//                    TextView textView = findViewById(R.id.debug_text);
-//                    textView.setText("Document Error");
                 }
             }
         });

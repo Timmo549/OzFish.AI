@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">OzFish.AI</string>
+    <string name="app_welcome">Welcome to OzFish.AI</string>
 
     <!-- About Team String -->
     <string name="about">
@@ -12,6 +13,12 @@
         \nData Collector - Haoran Ouang
         \n\nDeveloped in 2022 for the University of Wollongong
     </string>
+
+    <!-- Button Strings -->
+    <string name="identify_button">Identify Your Fish</string>
+    <string name="measure_button">Measure Your Fish</string>
+    <string name="search_button">Go Fishing (Search)</string>
+
 
     <!-- Help Menu Strings -->
     <string name="mainactivity_help_message">
@@ -46,8 +53,8 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="depth_api">Depth API</string>
+    <string name="instant_placement">Instant Placement</string>
 
     <!--  <string translatable="false" name="app_name">HelloAR Java</string> -->
     <string name="depth_use_explanation" translatable="false">When Depth is enabled on supported devices, virtual objects adapt to the environment by blending in with the real world.</string>
@@ -82,12 +89,24 @@
     <string name="okay">Okay</string>
     <string name="cancel">Cancel</string>
 
+    <!-- String used in HelloArActivity-->
+    <string name="result">RESULT</string>
+    <string name="legal_size">LEGAL SIZE?</string>
+
     <!-- Strings used in ResultsActivity -->
+    <string name="fish_name">fishName</string>
     <string name="is_this_your_fish">Is this your fish?</string>
     <string name="results_error_message">Error: Fish unable to be identified, please try again</string>
     <string name="results_error_okay">Okay</string>
 
     <!-- String used in InformationActivity -->
+    <string name="bag_limit">Bag Limit: </string>
+    <string name="possession_limit">Possession Limit: </string>
+    <string name="minimum_size">Minimum Length: </string>
+    <string name="season">Season: </string>
+    <string name="freshwater">Freshwater? </string>
+    <string name="saltwater">Saltwater? </string>
+    <string name="notes">Notes: </string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="none">None</string>

@@ -14,24 +14,13 @@
         android:fontFamily="sans-serif"
         android:letterSpacing="0.01"
         android:lineSpacingExtra="6sp"
-        android:text="Welcome to OzFish.AI"
+        android:text="@string/app_welcome"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/button_measure"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Measure Fish"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textview_first" />
 
     <ImageView
         android:id="@+id/imageView"
@@ -57,7 +46,7 @@
         android:layout_marginTop="120dp"
         android:enabled="false"
         android:lineSpacingExtra="6sp"
-        android:text="Identify Your Fish"
+        android:text="@string/identify_button"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textview_first"
@@ -72,7 +61,7 @@
         android:layout_marginTop="30dp"
         android:enabled="false"
         android:lineSpacingExtra="6sp"
-        android:text="Measure Your Fish"
+        android:text="@string/measure_button"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/identify_button"
@@ -87,7 +76,7 @@
         android:layout_marginTop="30dp"
         android:enabled="true"
         android:lineSpacingExtra="6sp"
-        android:text="Go Fishing (Search)"
+        android:text="@string/search_button"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/measure_button"

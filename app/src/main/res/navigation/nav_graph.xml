@@ -9,34 +9,7 @@
         android:id="@+id/FirstFragment"
         android:name="com.example.fishai.FirstFragment"
         android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
-
-        <action
-            android:id="@+id/action_FirstFragment_to_ResultsFragment"
-            app:destination="@id/ResultsFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/SecondFragment"
-        android:name="com.example.fishai.SecondFragment"
-        android:label="Second Page"
-        tools:layout="@layout/fragment_second">
-        <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/ResultsFragment"
-        android:name="com.example.fishai.ResultsFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_results">
-
-        <action
-            android:id="@+id/action_ResultsFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
-        <action
-            android:id="@+id/action_ResultsFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_first"/>
     <activity
         android:id="@+id/mainActivity"
         android:name="com.example.fishai.MainActivity"

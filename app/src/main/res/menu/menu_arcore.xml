@@ -6,7 +6,7 @@
       android:id="@+id/action_help"
       android:title="@string/action_help"/>
   <item android:id="@+id/depth_settings"
-      android:title="Depth API"/>
+      android:title="@string/depth_api"/>
   <item android:id="@+id/instant_placement_settings"
-      android:title="Instant Placement"/>
+      android:title="@string/instant_placement"/>
 </menu>
