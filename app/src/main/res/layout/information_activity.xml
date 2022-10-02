@@ -24,10 +24,10 @@
 
     <ImageView
         android:id="@+id/result_image"
-        android:layout_width="234dp"
-        android:layout_height="247dp"
+        android:layout_width="219dp"
+        android:layout_height="118dp"
         android:layout_marginStart="141dp"
-        android:layout_marginTop="104dp"
+        android:layout_marginTop="71dp"
         android:layout_marginEnd="142dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -38,153 +38,260 @@
         android:id="@+id/fish_name_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="15dp"
+        android:letterSpacing="0.01"
         android:text="fishName"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/result_image" />
+        app:layout_constraintTop_toBottomOf="@+id/result_image"
+        tools:visibility="visible" />
 
     <TableLayout
         android:id="@+id/tableLayout"
-        android:layout_width="409dp"
-        android:layout_height="503dp"
-        android:layout_marginStart="1dp"
-        android:layout_marginTop="1dp"
-        android:layout_marginEnd="1dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="5dp"
         android:stretchColumns="1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fish_name_text">
 
         <TableRow>
+
             <TextView
-                android:layout_width="160dp"
+                android:layout_width="140dp"
+                android:layout_column="0"
+                android:layout_marginLeft="10dip"
                 android:gravity="end"
-                android:padding="3dip"
-                android:text="Fish Name: "
-                android:layout_column="0" />
-
-            <TextView
-                android:id="@+id/fish_name"
-                android:gravity="center"
-                android:padding="3dip"
-                android:text=""
-                android:layout_column="1" />
-        </TableRow>
-
-
-        <TableRow>
-            <TextView
-                android:layout_width="160dp"
-                android:gravity="end"
-                android:padding="3dip"
+                android:letterSpacing="0.01"
+                android:padding="6dip"
                 android:text="Bag Limit: "
-                android:layout_column="0" />
+                android:textColor="@color/white"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/bag_limit"
-                android:gravity="center"
-                android:padding="3dip"
+                android:layout_width="0dp"
+                android:layout_column="1"
+                android:layout_marginEnd="10dip"
+                android:gravity="center|fill_horizontal"
+                android:letterSpacing="0.01"
+                android:lineSpacingExtra="6sp"
+                android:padding="6dip"
                 android:text=""
-                android:layout_column="1" />
+                android:textColor="@color/white" />
         </TableRow>
 
         <TableRow>
+
             <TextView
-                android:layout_width="160dp"
+                android:layout_width="140dp"
+                android:layout_column="0"
+                android:layout_marginStart="10dip"
                 android:gravity="end"
-                android:padding="3dip"
+                android:letterSpacing="0.01"
+                android:padding="6dip"
                 android:text="Possession Limit: "
-                android:layout_column="0" />
+                android:textColor="@color/white"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/possession_limit"
-                android:gravity="center"
-                android:padding="3dip"
+                android:layout_width="0dp"
+                android:layout_column="1"
+                android:layout_marginEnd="10dip"
+                android:gravity="center|fill_horizontal"
+                android:letterSpacing="0.01"
+                android:lineSpacingExtra="6sp"
+                android:padding="6dip"
                 android:text=""
-                android:layout_column="1" />
+                android:textColor="@color/white" />
         </TableRow>
 
         <TableRow>
+
             <TextView
-                android:layout_width="160dp"
+                android:layout_width="140dp"
+                android:layout_column="0"
+                android:layout_marginStart="10dip"
                 android:gravity="end"
-                android:padding="3dip"
+                android:letterSpacing="0.01"
+                android:padding="6dip"
                 android:text="Minimum Size: "
-                android:layout_column="0" />
+                android:textColor="@color/white"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/minimum_size"
-                android:gravity="center"
-                android:padding="3dip"
+                android:layout_width="0dp"
+                android:layout_column="1"
+                android:layout_marginEnd="10dip"
+                android:gravity="center|fill_horizontal"
+                android:letterSpacing="0.01"
+                android:lineSpacingExtra="6sp"
+                android:padding="6dip"
                 android:text=""
-                android:layout_column="1" />
+                android:textColor="@color/white" />
         </TableRow>
 
         <TableRow>
-            <TextView
-                android:layout_width="160dp"
 
-                android:padding="3dip"
+            <TextView
+                android:layout_width="140dp"
+
+                android:layout_column="0"
+                android:layout_marginStart="10dip"
                 android:gravity="end"
+                android:letterSpacing="0.01"
+                android:padding="6dip"
                 android:text="Season: "
-                android:layout_column="0" />
+                android:textColor="@color/white"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/season"
-                android:gravity="center"
-                android:padding="3dip"
+                android:layout_width="0dp"
+                android:layout_column="1"
+                android:layout_marginEnd="10dip"
+                android:gravity="center|fill_horizontal"
+                android:letterSpacing="0.01"
+                android:lineSpacingExtra="6sp"
+                android:padding="6dip"
                 android:text=""
-                android:layout_column="1" />
+                android:textColor="@color/white" />
         </TableRow>
 
         <TableRow>
+
             <TextView
-                android:layout_width="160dp"
+                android:layout_width="140dp"
+                android:layout_column="0"
+                android:layout_marginStart="10dip"
                 android:gravity="end"
-                android:padding="3dip"
+                android:letterSpacing="0.01"
+                android:padding="6dip"
                 android:text="Freshwater? "
-                android:layout_column="0" />
+                android:textColor="@color/white"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/freshwater"
-                android:gravity="center"
-                android:padding="3dip"
+                android:layout_width="0dp"
+                android:layout_column="1"
+                android:layout_marginEnd="10dip"
+                android:gravity="center|fill_horizontal"
+                android:letterSpacing="0.01"
+                android:lineSpacingExtra="6sp"
+                android:padding="6dip"
                 android:text=""
-                android:layout_column="1" />
+                android:textColor="@color/white" />
         </TableRow>
 
         <TableRow>
+
             <TextView
-                android:layout_width="160dp"
+                android:layout_width="140dp"
+                android:layout_column="0"
+                android:layout_marginStart="10dip"
                 android:gravity="end"
-                android:padding="3dip"
+                android:letterSpacing="0.01"
+                android:padding="6dip"
                 android:text="Saltwater? "
-                android:layout_column="0" />
+                android:textColor="@color/white"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/saltwater"
-                android:gravity="center"
-                android:padding="3dip"
+                android:layout_width="0dp"
+                android:layout_column="1"
+                android:layout_marginEnd="10dip"
+                android:gravity="center|fill_horizontal"
+                android:letterSpacing="0.01"
+                android:lineSpacingExtra="6sp"
+                android:padding="6dip"
                 android:text=""
-                android:layout_column="1" />
+                android:textColor="@color/white" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:layout_width="140dp"
+                android:layout_column="0"
+                android:layout_marginStart="10dip"
+                android:gravity="end"
+                android:letterSpacing="0.01"
+                android:padding="6dip"
+                android:text="Notes: "
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/note"
+                android:layout_width="0dp"
+                android:layout_column="1"
+                android:layout_marginEnd="10dip"
+                android:gravity="center|fill_horizontal"
+                android:letterSpacing="0.01"
+                android:lineSpacingExtra="6sp"
+                android:padding="6dip"
+                android:text=""
+                android:textColor="@color/white" />
         </TableRow>
     </TableLayout>
 
-    <TextView
-        android:id="@+id/debug_text"
-        android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:layout_marginStart="100dp"
-        android:layout_marginTop="256dp"
-        android:layout_marginEnd="100dp"
-        android:elevation="5dp"
-        android:text="DEBUG TEXT"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <Button
+        android:id="@+id/info_measure_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:enabled="true"
+        android:lineSpacingExtra="6dp"
+        android:text="Measure Fish"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/fish_name_text" />
+        app:layout_constraintTop_toBottomOf="@+id/tableLayout"
+        app:strokeColor="#C9F4EB"
+        app:strokeWidth="1dp" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/info_background"
+        android:elevation="-1dp"/>
+
+    <!--
+        <TextView
+            android:id="@+id/debug_text"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_marginStart="100dp"
+            android:layout_marginTop="256dp"
+            android:layout_marginEnd="100dp"
+            android:elevation="5dp"
+            android:text="DEBUG TEXT"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fish_name_text" />
+    -->
 </androidx.constraintlayout.widget.ConstraintLayout>

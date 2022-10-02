@@ -1,6 +1,45 @@
 <resources>
     <string name="app_name">OzFish.AI</string>
-    <string name="action_settings">Settings</string>
+
+    <!-- About Team String -->
+    <string name="about">
+        Authors:
+        \n\nTeam Coordinator - Jie Liu
+        \nLead Programmer/Tester - Timothy Carroll
+        \nAI Specialist - Can Liu
+        \nAI Specialist - Wei Guo
+        \nDatabase Designer - Hancheng Cai
+        \nData Collector - Haoran Ouang
+        \n\nDeveloped in 2022 for the University of Wollongong
+    </string>
+
+    <!-- Help Menu Strings -->
+    <string name="mainactivity_help_message">
+        This app possesses three main functions:
+        \n- Identify Fish will allow you to take a photo of a fish and identify its species,
+        \n- Measure Fish will allow you to measure the length of a fish using the device\'s rear camera,
+        \n- Go Fishing (Search) will allow you to search for a fish species and view its relevant information.
+        \n\nIf any of the following features are disabled, this means that that function is not supported on your current device.
+    </string>
+    <string name="helloaractivity_help_message">
+        To accurately measure fish length, first calibrate the AR environment by slowly moving your phone until the grid lines appear.
+        \nAfter this, tap the two ends of the fish and the length should be automatically calculated and displayed.
+        \n\nIf you make a mistake when identifying the fish ends, tap again until the ends of the fish are successfully selected.
+    </string>
+    <string name="resultsactivity_help_message">
+        If your fish matches the detected fish, click the yes button.
+        \nOtherwise, click no until your fish does match.
+        \n\nIf your fish is not correctly detected after three attempts, please take a new photo and try again.
+    </string>
+    <string name="infoactivity_help_message">
+        This page should provide all relevant fish identification.
+        \n\nTo measure your fish and confirm whether it meets the minimum length, press the appropriate button.
+    </string>
+
+    <string name="action_help">Help</string>
+    <string name="action_update_db">Update DB</string>
+    <string name="action_about">About</string>
+
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">Home</string>
     <string name="second_fragment_label">Results Page</string>
@@ -35,19 +74,100 @@
     <string name="action_2_toast">Reorder and set this cube to the first.</string>
     <string name="action_3_toast">Move on x and z axis.</string>
     <string name="action_4_toast">Move on y axis.</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 
     <!-- Strings used for MainActivity Dialog -->
+    <string name="database_error_message">Error: Issue loading fish dataset, please close app and try again</string>
+    <string name="database_updated_message">Database Update Successful</string>
     <string name="okay">Okay</string>
     <string name="cancel">Cancel</string>
 
-    <!-- Strings used for ResultsActivity Dialog -->
+    <!-- Strings used in ResultsActivity -->
+    <string name="is_this_your_fish">Is this your fish?</string>
     <string name="results_error_message">Error: Fish unable to be identified, please try again</string>
     <string name="results_error_okay">Okay</string>
 
+    <!-- String used in InformationActivity -->
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="none">None</string>
+
+    <!-- Fish Database Record Names -->
     <string-array name="fish_dataset">
+        <item>Albacore</item>
+        <item>Amberjack</item>
+        <item>Atlantic Salmon</item>
+        <item>Australian Bass</item>
+        <item>Australian Salmon</item>
+        <item>Australian Sawtail</item>
+        <item>Banded Morwong</item>
+        <item>Banded Rock Cod</item>
+        <item>Bass Groper</item>
+        <item>Big-Eye Tuna</item>
+        <item>Black Bream</item>
+        <item>Black Marlin</item>
+        <item>Blue Groper</item>
+        <item>Blue Marlin</item>
+        <item>Blue Spotted Flathead</item>
+        <item>Blue-Eye Trevalla</item>
+        <item>Bluefish</item>
+        <item>Bonito</item>
+        <item>Brook Trout</item>
+        <item>Brown Trout</item>
+        <item>Carp</item>
+        <item>Cobia</item>
+        <item>Dusky Flathead</item>
+        <item>Eastern Freshwater Cod</item>
+        <item>Eastern Red Scorpionfish</item>
+        <item>Eastern School Whiting</item>
+        <item>Estuary Perch</item>
+        <item>Flounder</item>
+        <item>Freshwater Catfish</item>
+        <item>Garfish</item>
+        <item>Gemfish</item>
+        <item>Golden Perch</item>
+        <item>Grey Morwong</item>
+        <item>Hairtail</item>
+        <item>Hapuku</item>
+        <item>Jackass Morwong</item>
+        <item>Leatherjacket</item>
+        <item>Long Finned Eel</item>
+        <item>Longtail Tuna</item>
+        <item>Luderick</item>
+        <item>Macquarie Perch</item>
+        <item>Mahi Mahi</item>
+        <item>Mangrove Jack</item>
+        <item>Moses Snapper</item>
+        <item>Mullet</item>
+        <item>Mulloway</item>
+        <item>Murray Cod</item>
+        <item>Pearl Perch</item>
+        <item>Rainbow Trout</item>
+        <item>Red Morwong</item>
+        <item>Redfin Perch</item>
+        <item>Rock Blackfish</item>
         <item>Sailfish</item>
+        <item>Samsonfish</item>
+        <item>Sand Whiting</item>
+        <item>Short Finned Eel</item>
+        <item>Silver Perch</item>
+        <item>Snapper</item>
+        <item>Southern Bluefin Tuna</item>
+        <item>Spanish Mackerel</item>
+        <item>Spearfish</item>
+        <item>Spotted Mackerel</item>
+        <item>Striped Marlin</item>
+        <item>Swordfish</item>
+        <item>Tailor</item>
+        <item>Tarwhine</item>
+        <item>Teraglin</item>
+        <item>Tiger Flathead</item>
+        <item>Trevally</item>
+        <item>Trout Cod</item>
+        <item>Wahoo</item>
+        <item>Yellowfin Bream</item>
+        <item>Yellowfin Tuna</item>
+        <item>Yellowtail Kingfish</item>
     </string-array>
 
 </resources>

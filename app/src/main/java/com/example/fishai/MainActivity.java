@@ -10,17 +10,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,23 +24,27 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.fishai.databinding.ActivityMainBinding;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.examples.java.common.helpers.CameraPermissionHelper;
 import com.google.ar.core.examples.java.helloar.HelloArActivity;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Source;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -63,11 +63,10 @@ public class MainActivity extends AppCompatActivity {
     private String currentPhotoPath;
     private String fishToSearch;
 
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private ArrayList<CharSequence> fishDataset;
 
     NavController navController;
-    ImageView imageView;
-    TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,11 +83,11 @@ public class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-//        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav);
-//        NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
-         imageView = findViewById(R.id.result_image);
-         textView = findViewById(R.id.textView);
+        fishDataset = new ArrayList<CharSequence>();
+        getFishRecords(false);
+
+        checkCameraPermissionGiven();
 
         // Enable AR-related functionality on ARCore supported devices only.
         if (maybeEnableArButton()) {
@@ -162,36 +161,6 @@ public class MainActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
-
-/*
-        bottomNavigationView.setOnItemSelectedListener( item -> {
-            switch (item.getItemId()) {
-                case R.id.fish_identify:
-                    openCamera();
-                    break;
-                case R.id.fish_measure:
-                    openMeasure();
-                    break;
-                default:
-                    break;
-            }
-            return true;
-        });
-
-        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
-            @Override
-            public void onDestinationChanged(@NonNull NavController controller,
-                                             @NonNull NavDestination destination, @Nullable Bundle arguments) {
-                if(destination.getId() == R.id.FirstFragment) {
-//                    showFab(true);
-                    bottomNavigationView.setVisibility(View.VISIBLE);
-                } else {
-//                    showFab(false);
-                    bottomNavigationView.setVisibility(View.GONE);
-                }
-            }
-        });
-*/
     }
 
 
@@ -199,7 +168,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() { super.onDestroy(); }
 
     @Override
-    protected void onResume() { super.onResume(); }
+    protected void onResume() {
+        super.onResume();
+//        checkCameraPermissionGiven();
+        maybeEnableCameraButton();
+        maybeEnableArButton();
+    }
 
     @Override
     public void onPause() { super.onPause(); }
@@ -219,24 +193,24 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_help) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setMessage(R.string.mainactivity_help_message).setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int id) {
+                    dialogInterface.dismiss();
+                }
+            });
+            builder.create().show();
             return true;
         }
-        else if (id == R.id.action_test) {
+        else if (id == R.id.action_update_db) {
+            getFishRecords(true);
             return true;
         }
         else if (id == R.id.action_about) {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setMessage(
-                    "Authors:" +
-                    "\nTeam Coordinator - Jie Liu" +
-                    "\nLead Programmer/Tester - Timothy Carroll" +
-                    "\nAI Specialist - Can Liu" +
-                    "\nAI Specialist - Wei Guo" +
-                    "\nDatabase Designer - Hancheng Cai" +
-                    "\nData Collector - Haoran Ouang" +
-                    "\n\nDeveloped in 2022 for the University of Wollongong"
-                    ).setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+            builder.setMessage(R.string.about).setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int id) {
                     dialogInterface.dismiss();
@@ -272,31 +246,33 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean maybeEnableCameraButton() {
-//        BottomNavigationView bottomNavView = findViewById(R.id.bottom_nav);
-//        Menu nav_Menu = bottomNavView.getMenu();
+    private void checkCameraPermissionGiven() {
+        // Camera functionality requires camera permissions to operate. If we did not yet obtain runtime
+        // permission on Android M and above, now is a good time to ask the user for it.
+        if (!CameraPermissionHelper.hasCameraPermission(this)) {
+            CameraPermissionHelper.requestCameraPermission(this);
+        }
+    }
 
+    private boolean maybeEnableCameraButton() {
         Button camera_button = findViewById(R.id.identify_button);
 
         // Test to see if the device has an available camera to leverage
         if (this.getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)){
-            // This device has a camera, so enable the camera functionality
-//            showFab(true);
-            camera_button.setEnabled(true);
-//            nav_Menu.findItem(R.id.fish_identify).setVisible(true);
-            return true;
+            if (CameraPermissionHelper.hasCameraPermission(this)) {
+                // This device has a camera, so enable the camera functionality
+                camera_button.setEnabled(true);
+                return true;
+            }
+            return false;
         } else {
             // No camera on this device, so disable the camera functionality
             camera_button.setEnabled(false);
-//            nav_Menu.findItem(R.id.fish_identify).setVisible(false);
             return false;
         }
     }
 
     private boolean maybeEnableArButton() {
-//        BottomNavigationView bottomNavView = findViewById(R.id.bottom_nav);
-//        Menu nav_Menu = bottomNavView.getMenu();
-
         Button measure_button = findViewById(R.id.measure_button);
 
         // Query availability of AR functionality on host device
@@ -312,14 +288,14 @@ public class MainActivity extends AppCompatActivity {
         }
         if (availability.isSupported()) {
             // Enable AR functionality
-            measure_button.setEnabled(true);
-            //nav_Menu.findItem(R.id.fish_measure).setVisible(true);
+            if (CameraPermissionHelper.hasCameraPermission(this)) {
+                measure_button.setEnabled(true);
+            }
             return true;
         } else {
             // The device is unsupported or unknown.
             // AR not supported
             measure_button.setEnabled(false);
-            //nav_Menu.findItem(R.id.fish_measure).setVisible(false);
             return false;
        }
     }
@@ -340,15 +316,13 @@ public class MainActivity extends AppCompatActivity {
 
     protected void openCamera() {
         // Start Activity to take photos with the Phone's Camera
-//        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-//        startActivityForResult(cameraIntent, CAMERA_REQUEST);
         dispatchTakePictureIntent();
     }
 
     protected void openMeasure() {
         // Start Activity to measure fish with the ARCore Engine
-        Intent measureFish = new Intent(this, HelloArActivity.class);
-        startActivity(measureFish);
+        Intent measureIntent = new Intent(this, HelloArActivity.class);
+        startActivity(measureIntent);
     }
 
     protected void openMLEngine(String path) {
@@ -370,9 +344,45 @@ public class MainActivity extends AppCompatActivity {
         // When the camera image capture activity concludes
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             // Navigate to results page
-//            openMLEngine(image);
             openMLEngine(currentPhotoPath);
         }
+    }
+
+    private void getFishRecords(boolean confirm) {
+        Source source = Source.SERVER;
+//        Source source = Source.DEFAULT;
+
+        CollectionReference docRef = db.collection("fish");
+        docRef.get(source).addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot doc : task.getResult()) {
+                        fishDataset.add((CharSequence) doc.getData().get("name"));
+                    }
+                    if (confirm) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setMessage(R.string.database_updated_message).setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int id) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+                        builder.create().show();
+                    }
+                } else {
+                    // Error, something went wrong
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setMessage(R.string.database_error_message).setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int id) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+                    builder.create().show();
+                }
+            }
+        });
     }
 
     private void dispatchTakePictureIntent() {
@@ -399,7 +409,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 
     private File createImageFile() throws IOException {
         // Create an image file name

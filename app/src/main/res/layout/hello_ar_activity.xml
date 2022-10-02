@@ -34,12 +34,14 @@
 
   </com.google.android.material.appbar.AppBarLayout>
 
+  <!--      android:layout_above="@+id/tv_result_label" -->
+
   <FrameLayout
       android:id="@+id/fl_content"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:layout_above="@+id/tv_result_label"
-      />
+      android:layout_above="@+id/artableLayout"
+      android:layout_marginBottom="0dp" />
 
   <android.opengl.GLSurfaceView
       android:id="@+id/surfaceview"
@@ -47,34 +49,84 @@
       android:layout_height="fill_parent"
       android:layout_gravity="top" />
 
-  <TextView
-      android:id="@+id/tv_result_label"
+
+  <TableLayout
+      android:id="@+id/artableLayout"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_above="@+id/tv_result"
-      android:layout_alignLeft="@+id/tv_result"
-      android:layout_alignRight="@+id/tv_result"
+      android:layout_alignBottom="@id/surfaceview"
       android:background="#333333"
-      android:paddingLeft="16dp"
-      android:paddingTop="16dp"
-      android:paddingRight="16dp"
-      android:paddingBottom="2dp"
-      android:text="RESULT"
-      android:textColor="#ffffff"
-      android:textSize="14sp" />
+      android:stretchColumns="1">
 
-  <TextView
-      android:id="@+id/tv_result"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_alignParentBottom="true"
-      android:background="#333333"
-      android:paddingLeft="16dp"
-      android:paddingTop="2dp"
-      android:paddingRight="16dp"
-      android:paddingBottom="24dp"
-      android:textColor="#ffffff"
-      android:textSize="18sp"
-      tools:text="0cm" />
+    <TableRow>
 
+      <TextView
+          android:id="@+id/tv_result_label"
+          android:layout_width="200dp"
+          android:layout_height="40dp"
+          android:letterSpacing="0.01"
+          android:lineSpacingExtra="6sp"
+          android:paddingLeft="16dp"
+          android:paddingTop="16dp"
+          android:paddingRight="16dp"
+          android:paddingBottom="2dp"
+          android:text="RESULT"
+          android:textColor="#ffffff"
+          android:textSize="20sp"
+          android:layout_column="0" />
+
+      <TextView
+          android:id="@+id/legal_size_label"
+          android:layout_width="0dp"
+          android:layout_height="match_parent"
+          android:layout_column="1"
+          android:gravity="center|fill_horizontal"
+          android:letterSpacing="0.01"
+          android:lineSpacingExtra="6sp"
+          android:paddingLeft="16dp"
+          android:paddingTop="16dp"
+          android:paddingRight="16dp"
+          android:paddingBottom="2dp"
+          android:text="LEGAL SIZE?"
+          android:textColor="#ffffff"
+          android:textSize="20sp"
+          android:visibility="invisible" />
+    </TableRow>
+
+    <TableRow>
+
+      <TextView
+          android:id="@+id/tv_result"
+          android:layout_width="wrap_content"
+          android:layout_height="60dp"
+          android:layout_alignParentBottom="true"
+          android:letterSpacing="0.01"
+          android:lineSpacingExtra="6sp"
+          android:paddingLeft="16dp"
+          android:paddingTop="2dp"
+          android:paddingRight="16dp"
+          android:paddingBottom="24dp"
+          android:textColor="#ffffff"
+          android:textSize="28sp"
+          android:textStyle="bold"
+          tools:text="0cm" />
+
+      <TextView
+          android:id="@+id/legal_size"
+          android:layout_width="0dp"
+          android:layout_height="match_parent"
+          android:layout_alignParentBottom="true"
+          android:letterSpacing="0.01"
+          android:lineSpacingExtra="6sp"
+          android:paddingLeft="16dp"
+          android:paddingTop="2dp"
+          android:paddingRight="16dp"
+          android:paddingBottom="24dp"
+          android:textColor="#ffffff"
+          android:textSize="28sp"
+          android:textStyle="bold"
+          android:gravity="center|fill_horizontal"
+          android:layout_column="1" />
+    </TableRow>
+  </TableLayout>
 </RelativeLayout>

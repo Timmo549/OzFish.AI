@@ -24,10 +24,10 @@
 
     <ImageView
         android:id="@+id/result_image"
-        android:layout_width="234dp"
-        android:layout_height="247dp"
+        android:layout_width="305dp"
+        android:layout_height="184dp"
         android:layout_marginStart="141dp"
-        android:layout_marginTop="104dp"
+        android:layout_marginTop="126dp"
         android:layout_marginEnd="142dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -38,33 +38,47 @@
         android:id="@+id/textview_first"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Is this your fish?"
+        android:layout_marginTop="90dp"
+        android:letterSpacing="0.01"
+        android:lineSpacingExtra="6sp"
+        android:text="@string/is_this_your_fish"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fish_name_text" />
+        app:layout_constraintTop_toBottomOf="@+id/fish_name_result" />
 
     <Button
         android:id="@+id/button_results_yes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="54dp"
-        android:layout_marginTop="32dp"
-        android:text="Yes"
+        android:layout_marginTop="20dp"
+        android:lineSpacingExtra="6sp"
+        android:text="@string/yes"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textview_first" />
+        app:layout_constraintTop_toBottomOf="@id/textview_first"
+        app:strokeColor="#C9F4EB"
+        app:strokeWidth="1dp" />
 
     <Button
         android:id="@+id/button_results_no"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="54dp"
-        android:text="No"
+        android:lineSpacingExtra="6sp"
+        android:text="@string/no"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textview_first" />
+        app:layout_constraintTop_toBottomOf="@id/textview_first"
+        app:strokeColor="#C9F4EB"
+        app:strokeWidth="1dp" />
 
+<!--
     <TextView
         android:id="@+id/debug_text"
         android:layout_width="match_parent"
@@ -79,16 +93,36 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_results_yes" />
-
+-->
     <TextView
-        android:id="@+id/fish_name_text"
+        android:id="@+id/fish_name_result"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
+        android:letterSpacing="0.01"
+        android:lineSpacingExtra="6sp"
         android:text="fishName"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/result_image" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/results_background"
+        android:elevation="-1dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

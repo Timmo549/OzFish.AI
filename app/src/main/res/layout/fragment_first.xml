@@ -10,10 +10,11 @@
         android:id="@+id/textview_first"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="128dp"
-        android:elevation="5dp"
+        android:layout_marginTop="140dp"
         android:fontFamily="sans-serif"
-        android:text="Welcome to the OzFish.AI app"
+        android:letterSpacing="0.01"
+        android:lineSpacingExtra="6sp"
+        android:text="Welcome to OzFish.AI"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="24sp"
@@ -38,6 +39,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="bottom"
         android:scaleType="fitXY"
+        android:elevation="-1dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -53,10 +55,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="150dp"
         android:layout_marginTop="120dp"
-        android:text="Identify Your Fish"
         android:enabled="false"
+        android:lineSpacingExtra="6sp"
+        android:text="Identify Your Fish"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textview_first" />
+        app:layout_constraintTop_toBottomOf="@+id/textview_first"
+        app:strokeColor="#C9F4EB"
+        app:strokeWidth="1dp" />
 
     <Button
         android:id="@+id/measure_button"
@@ -64,10 +70,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="120dp"
         android:layout_marginTop="30dp"
-        android:text="Measure Your Fish"
         android:enabled="false"
+        android:lineSpacingExtra="6sp"
+        android:text="Measure Your Fish"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/identify_button" />
+        app:layout_constraintTop_toBottomOf="@+id/identify_button"
+        app:strokeColor="#C9F4EB"
+        app:strokeWidth="1dp" />
 
     <Button
         android:id="@+id/search_button"
@@ -75,10 +85,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="90dp"
         android:layout_marginTop="30dp"
-        android:text="Go Fishing (Search)"
         android:enabled="true"
+        android:lineSpacingExtra="6sp"
+        android:text="Go Fishing (Search)"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/measure_button" />
+        app:layout_constraintTop_toBottomOf="@+id/measure_button"
+        app:strokeColor="#C9F4EB"
+        app:strokeWidth="1dp" />
 
     <!--
         <ImageView

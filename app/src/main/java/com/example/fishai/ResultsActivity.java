@@ -14,17 +14,26 @@ import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.fishai.databinding.ActivityMainBinding;
 import com.example.fishai.databinding.ResultsActivityBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 
 import org.tensorflow.lite.examples.classification.Classifier;
 import org.tensorflow.lite.examples.classification.ClassifierFloatMobileNet;
@@ -36,6 +45,7 @@ import org.tensorflow.lite.support.image.ops.Rot90Op;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class ResultsActivity extends AppCompatActivity {
@@ -46,6 +56,9 @@ public class ResultsActivity extends AppCompatActivity {
     private String fishName;
 
     private List<Classifier.Recognition> results;
+
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private Map<String, Object> document;
 
     @SuppressLint("WrongThread")
     @Override
@@ -61,12 +74,8 @@ public class ResultsActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         String pathToPicture = bundle.getString("path");
-//        TextView textView = findViewById(R.id.textView);
-//        textView.setText("Extras: " + pathToPicture);
 
         Bitmap image = BitmapFactory.decodeFile(pathToPicture);
-
-
 
 /*
         // Code for testing with sailfish image (or subsequently any image within the asset folder)
@@ -86,13 +95,9 @@ public class ResultsActivity extends AppCompatActivity {
         }
 
         image.setConfig(Bitmap.Config.ARGB_8888);
-
-
-
-
-
 */
-        TextView fishNameView = findViewById(R.id.fish_name_text);
+
+        TextView fishNameView = findViewById(R.id.fish_name_result);
         ImageView fishPicture = findViewById(R.id.result_image);
 
         binding.buttonResultsYes.setOnClickListener(new View.OnClickListener() {
@@ -108,17 +113,10 @@ public class ResultsActivity extends AppCompatActivity {
                 // Expected counter range = 0-2
                 if (counter < 2) {
                     counter++;
-                    fishName = results.get(counter).getTitle();
+                    fishName = results.get(counter).getTitle().trim();
                     fishNameView.setText(fishName);
 
-                    String path = "pictures/" + fishName.toLowerCase() + ".jpg";
-
-                    try {
-                        fishPicture.setImageBitmap(ImageDecoder.decodeBitmap(ImageDecoder.createSource(getAssets(), path)));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
+                    getFishRecord(fishName);
                 } else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(ResultsActivity.this);
                     builder.setMessage(R.string.results_error_message).setPositiveButton(R.string.results_error_okay, new DialogInterface.OnClickListener() {
@@ -140,25 +138,15 @@ public class ResultsActivity extends AppCompatActivity {
 
             if (results != null) {
                 counter = 0;
-                fishName = results.get(counter).getTitle();
+                fishName = results.get(counter).getTitle().trim();
                 fishNameView.setText(fishName);
 
-                String path = "pictures/" + fishName.toLowerCase() + ".jpg";
-
-                try {
-                    fishPicture.setImageBitmap(ImageDecoder.decodeBitmap(ImageDecoder.createSource(getAssets(), path)));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                getFishRecord(fishName);
             }
         } else {
-            TextView textView = findViewById(R.id.debug_text);
-            textView.setText("Couldn't find Bitmap");
+//            TextView textView = findViewById(R.id.debug_text);
+//            textView.setText("Couldn't find Bitmap");
         }
-
-
-
-
     }
 
     protected void nextFish() {
@@ -180,6 +168,87 @@ public class ResultsActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_results, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_help) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ResultsActivity.this);
+            builder.setMessage(R.string.resultsactivity_help_message).setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int id) {
+                    dialogInterface.dismiss();
+                }
+            });
+            builder.create().show();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void getFishRecord(String fishName) {
+        Source source = Source.CACHE;
+//        Source source = Source.DEFAULT;
+
+        DocumentReference docRef = db.collection("fish").document(fishName);
+        docRef.get(source).addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot doc = task.getResult();
+                    if (doc.exists()) {
+                        // Document found
+                        document = doc.getData();
+                        populateFields();
+//                        TextView textView = findViewById(R.id.debug_text);
+//                        textView.setText("Document Found");
+                    } else {
+                        // Error, no document found
+//                        TextView textView = findViewById(R.id.debug_text);
+//                        textView.setText("Document Not Found");
+                    }
+                } else {
+                    // Error, something went wrong
+//                    TextView textView = findViewById(R.id.debug_text);
+//                    textView.setText("Document Error");
+                }
+            }
+        });
+    }
+
+    private void populateFields() {
+        if (document != null) {
+/*
+            name: String
+            photo: String
+ */
+
+            TextView textView = findViewById(R.id.fish_name_result);
+            textView.setText(String.valueOf(document.get("name")));
+
+            ImageView fishPicture = findViewById(R.id.result_image);
+            String path = String.valueOf(document.get("photo"));
+
+            try {
+                fishPicture.setImageBitmap(ImageDecoder.decodeBitmap(ImageDecoder.createSource(getAssets(), path)));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     protected void openFishInformation() {
         // Start Activity to display fish results based on identified fish
         Intent informationIntent = new Intent(ResultsActivity.this, InformationActivity.class);
@@ -187,6 +256,7 @@ public class ResultsActivity extends AppCompatActivity {
         startActivity(informationIntent);
     }
 
+/*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -198,26 +268,27 @@ public class ResultsActivity extends AppCompatActivity {
 
 //            int counter = 1;
 //            textView.setText("Results: \n");
-/*            for (Classifier.Recognition result : results) {
+            for (Classifier.Recognition result : results) {
                 textView.append(counter++ + ": " + result.toString() + "\n");
             }
-*/
+
     }
+*/
 
     protected List<Classifier.Recognition> performClassification(Bitmap image) {
         try {
             Classifier classifier = new ClassifierFloatMobileNet(this, Classifier.Device.NNAPI, 1);
             List<Classifier.Recognition> results = classifier.recognizeImage(image, 90);
 
-                TextView textView = findViewById(R.id.debug_text);
-                int counter = 1;
-                textView.setText("Results: \n");
-                for (Classifier.Recognition result : results) {
-                    textView.append(counter++ + ": " + result.toString() + "\n");
-                }
+//                TextView textView = findViewById(R.id.debug_text);
+//                int counter = 1;
+//                textView.setText("Results: \n");
+//                for (Classifier.Recognition result : results) {
+//                    textView.append(counter++ + ": " + result.toString() + "\n");
+//                }
 
-                ImageView imageView = findViewById(R.id.result_image);
-                imageView.setImageBitmap(loadImage(image, 90, classifier).getBitmap());
+//                ImageView imageView = findViewById(R.id.result_image);
+//                imageView.setImageBitmap(loadImage(image, 90, classifier).getBitmap());
 //                image = loadImage(image, 270, classifier).getBitmap();
 
             classifier.close();

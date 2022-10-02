@@ -55,13 +55,13 @@ public class ClassifierFloatMobileNet extends Classifier {
         // you can download this file from
         // see build.gradle for where to obtain this file. It should be auto
         // downloaded into assets.
-        return "tensorflowlite/fishdotai/model.tflite";
+        return "tensorflowlite/fishdotai/current/model.tflite";
 //        return "tensorflowlite/tensorflowhub/efficientnet_lite4_fp32_2.tflite";
     }
 
     @Override
     protected String getLabelPath() {
-        return "tensorflowlite/fishdotai/labels.txt";
+        return "tensorflowlite/fishdotai/current/labels.txt";
 //       return "tensorflowlite/tensorflowhub/labels.txt";
     }
 

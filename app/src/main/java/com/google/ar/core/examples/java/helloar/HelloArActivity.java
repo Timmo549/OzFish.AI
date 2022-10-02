@@ -21,6 +21,8 @@ import static java.lang.Math.pow;
 
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.ImageDecoder;
 import android.media.Image;
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
@@ -31,13 +33,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.fishai.InformationActivity;
+import com.example.fishai.ResultsActivity;
 import com.example.fishai.databinding.HelloArActivityBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.Camera;
@@ -89,9 +97,14 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import com.example.fishai.R;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 
 /**
  * This is a simple example that shows how to create an augmented reality (AR) application using the
@@ -99,7 +112,7 @@ import com.example.fishai.R;
  * plane to place a 3D model.
  */
 public class HelloArActivity extends AppCompatActivity implements SampleRender.Renderer {
-
+  private HelloArActivityBinding binding;
   private static final String TAG = HelloArActivity.class.getSimpleName();
 
   private static final String SEARCHING_PLANE_MESSAGE = "Searching for surfaces...";
@@ -194,17 +207,14 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
   private final float[] worldLightDirection = {0.0f, 0.0f, 0.0f, 0.0f};
   private final float[] viewLightDirection = new float[4]; // view x world light direction
 
-  private HelloArActivityBinding binding;
 
-  /*
-  private Pose cameraPose;
+  // For fish database integration
+  private FirebaseFirestore db = FirebaseFirestore.getInstance();
+  private Map<String, Object> document;
+  private boolean fishCompare = false;
 
-  private static final String ASSET_NAME_CUBE_OBJ = "cube.obj";
-  private static final String ASSET_NAME_CUBE = "cube_green.png";
-  private static final String ASSET_NAME_CUBE_SELECTED = "cube_cyan.png";
 
-  private static final int MAX_CUBE_COUNT = 16;
-  */
+//  private Pose cameraPose;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -239,6 +249,22 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
     depthSettings.onCreate(this);
     instantPlacementSettings.onCreate(this);
 
+    Bundle bundle = getIntent().getExtras();
+    if (bundle != null) {
+      String fishName = bundle.getString("fishName").trim();
+      getFishRecord(fishName);
+
+      TextView textView = findViewById(R.id.legal_size_label);
+      textView.setVisibility(View.VISIBLE);
+
+      textView = findViewById(R.id.legal_size);
+      textView.setVisibility(View.VISIBLE);
+
+      fishCompare = true;
+    }
+
+
+
   }
 
   // Creates the settings menu and adds it to the toolbar
@@ -259,7 +285,18 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
 
     // Menu items to launch feature specific settings.
     //noinspection SimplifiableIfStatement
-    if (id == R.id.depth_settings) {
+    if (id == R.id.action_help) {
+      new AlertDialog.Builder(this)
+              .setMessage(R.string.helloaractivity_help_message)
+              .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int id) {
+                  dialogInterface.dismiss();
+                }
+              })
+              .show();
+      return true;
+    } else if (id == R.id.depth_settings) {
       launchDepthSettingsMenuDialog();
       return true;
     } else if (id == R.id.instant_placement_settings) {
@@ -453,14 +490,14 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
           Texture.createFromAsset(
               render,
 //              "models/pawn_albedo.png",
-              "models/hl3hl3/cube_green.png",
+              "models/hl3hl3/cube_light.png",
               Texture.WrapMode.CLAMP_TO_EDGE,
               Texture.ColorFormat.SRGB);
       virtualObjectAlbedoInstantPlacementTexture =
           Texture.createFromAsset(
               render,
 //              "models/pawn_albedo_instant_placement.png",
-                  "models/hl3hl3/cube_cyan.png",
+                  "models/hl3hl3/cube_blue.png",
               Texture.WrapMode.CLAMP_TO_EDGE,
               Texture.ColorFormat.SRGB);
       Texture virtualObjectPbrTexture =
@@ -1012,8 +1049,6 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
 //    calculateDistance(wrappedAnchors.get(0).getAnchor().getPose(), wrappedAnchors.get(1).getAnchor().getPose());
     // If result UI element doesn't exist then do nothing - mostly for debug as element should always exist
     if (findViewById(R.id.tv_result) != null) {
-      TextView result = (TextView) findViewById(R.id.tv_result);
-
       // Calculate Distance
       Double distance = calculateDistance(wrappedAnchors.get(0).getAnchor().getPose(), wrappedAnchors.get(1).getAnchor().getPose());
       String units = "";
@@ -1027,8 +1062,31 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
         distance *= 100;
       }
 
-      // Display distance
-      result.setText(String.format("%.2f", new BigDecimal(distance)).concat(units));
+      final Double finalDistance = distance;
+      final String finalUnits = units;
+
+      // Updates the UI
+      runOnUiThread(new Runnable() {
+
+        @Override
+        public void run() {
+          // Display distance
+          TextView result = (TextView) findViewById(R.id.tv_result);
+          result.setText(String.format("%.2f", new BigDecimal(finalDistance)).concat(finalUnits));
+
+          if (fishCompare) {
+            result = findViewById(R.id.legal_size);
+
+            if (finalDistance >= Double.parseDouble(String.valueOf(document.get("minimum_size")))) {
+              result.setTextColor(Color.GREEN);
+              result.setText(R.string.yes);
+            } else {
+              result.setTextColor(Color.RED);
+              result.setText(R.string.no);
+            }
+          }
+        }
+      });
     }
   }
 
@@ -1085,6 +1143,51 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
     midAnchors.add(new WrappedAnchor(session.createAnchor(midPoint), null));
   }
 
+  private void getFishRecord(String fishName) {
+    Source source = Source.CACHE;
+//        Source source = Source.DEFAULT;
+
+    DocumentReference docRef = db.collection("fish").document(fishName);
+    docRef.get(source).addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+      @Override
+      public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+        if (task.isSuccessful()) {
+          DocumentSnapshot doc = task.getResult();
+          if (doc.exists()) {
+            // Document found
+            document = doc.getData();
+            populateFields();
+//                        TextView textView = findViewById(R.id.debug_text);
+//                        textView.setText("Document Found");
+          } else {
+            // Error, no document found
+//                        TextView textView = findViewById(R.id.debug_text);
+//                        textView.setText("Document Not Found");
+          }
+        } else {
+          // Error, something went wrong
+//                    TextView textView = findViewById(R.id.debug_text);
+//                    textView.setText("Document Error");
+        }
+      }
+    });
+  }
+
+  private void populateFields() {
+    if (document != null) {
+/*
+            name: String
+            minimum_size: Integer
+ */
+/*
+      TextView textView = findViewById(R.id.fish_name_result);
+      textView.setText(String.valueOf(document.get("name")));
+
+      ImageView fishLength = findViewById(R.id.result_image);
+      String path = String.valueOf(document.get("photo"));
+*/
+    }
+  }
 }
 
 /**

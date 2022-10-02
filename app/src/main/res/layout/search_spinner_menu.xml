@@ -7,12 +7,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<!--    <Spinner
-        android:id="@+id/fish_search_spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
--->
-
     <Spinner
         android:id="@+id/search_spinner"
         android:layout_width="match_parent"
