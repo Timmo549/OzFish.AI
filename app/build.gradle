@@ -4,6 +4,20 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('C:\\Users\\Tim-PC\\.android\\keystore.jks')
+            storePassword 'pRc5mwS$MzX4S#hiuXsW'
+            keyPassword 'pRc5mwS$MzX4S#hiuXsW'
+            keyAlias 'key0'
+        }
+        release {
+            storeFile file('C:\\Users\\Tim-PC\\.android\\keystore.jks')
+            storePassword 'pRc5mwS$MzX4S#hiuXsW'
+            keyAlias 'key0'
+            keyPassword 'pRc5mwS$MzX4S#hiuXsW'
+        }
+    }
     compileSdk 32
 
     defaultConfig {
@@ -11,7 +25,7 @@ android {
         minSdk 31
         targetSdk 32
         versionCode 1
-        versionName "1.0.1"
+        versionName "1.0.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -20,6 +34,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.debug
         }
     }
     compileOptions {

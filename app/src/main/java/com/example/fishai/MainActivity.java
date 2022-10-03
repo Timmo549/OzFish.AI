@@ -1,5 +1,6 @@
 package com.example.fishai;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +24,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -46,10 +49,11 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.Logger;
 
 
 public class MainActivity extends AppCompatActivity {
-//    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final int CAMERA_REQUEST = 1888;
     private static final int TIME_DELAY = 2000;
@@ -66,8 +70,6 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ArrayList<CharSequence> fishDataset;
 
-    NavController navController;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,44 +79,20 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar);
 
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
-        navController = navHostFragment.getNavController();
-//        navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-
-
+        // Populate application database from Firestore data repository
         fishDataset = new ArrayList<CharSequence>();
         getFishRecords(false);
 
+        // Check if application has camera permissions.
         checkCameraPermissionGiven();
 
-        // Enable AR-related functionality on ARCore supported devices only.
-        if (maybeEnableArButton()) {
-            arEnabled = true;
-
-            Button measure_button = findViewById(R.id.measure_button);
-            measure_button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    openMeasure();
-                }
-            });
-        }
-
         // Enable Camera related functionality on devices with accessible cameras only.
-        if (maybeEnableCameraButton()) {
-            cameraEnabled = true;
+        maybeEnableCameraButton();
 
-            Button camera_button = findViewById(R.id.identify_button);
-            camera_button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    openCamera();
-                }
-            });
-        }
+        // Enable AR-related functionality on ARCore supported devices only.
+        maybeEnableArButton();
 
+        // Enable Search related functionality.
         Button search_button = findViewById(R.id.search_button);
         search_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -171,6 +149,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 //        checkCameraPermissionGiven();
+
+        // Perform another check to enable camera and AR functionalities
         maybeEnableCameraButton();
         maybeEnableArButton();
     }
@@ -224,26 +204,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        return NavigationUI.navigateUp(navController, appBarConfiguration)
-                || super.onSupportNavigateUp();
-    }
-
-    @Override
     public void onBackPressed() {
-//        navController.navigateUp();
-        // If the user is currently on the home screen
-        if (navController.getCurrentDestination().getId() == R.id.FirstFragment) {
-            // If the user double taps the back button, the application will close
-            if (back_pressed + TIME_DELAY > System.currentTimeMillis()) {
-                super.onBackPressed();
-            } else {
-                Toast.makeText(getBaseContext(), "Press once again to exit!",
-                        Toast.LENGTH_SHORT).show();
-            }
-            back_pressed = System.currentTimeMillis();
+        // If the user double taps the back button, the application will close
+        if (back_pressed + TIME_DELAY > System.currentTimeMillis()) {
+            super.onBackPressed();
+        } else {
+            Toast.makeText(getBaseContext(), "Press once again to exit!",
+                    Toast.LENGTH_SHORT).show();
         }
+        back_pressed = System.currentTimeMillis();
     }
 
     private void checkCameraPermissionGiven() {
@@ -262,14 +231,27 @@ public class MainActivity extends AppCompatActivity {
             if (CameraPermissionHelper.hasCameraPermission(this)) {
                 // This device has a camera, so enable the camera functionality
                 camera_button.setEnabled(true);
+
+                camera_button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) { openCamera(); }
+                });
+
                 return true;
             }
-            return false;
         } else {
             // No camera on this device, so disable the camera functionality
             camera_button.setEnabled(false);
             return false;
         }
+        // Continue to query availability at 2Hz in the background.
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                maybeEnableCameraButton();
+            }
+        }, 500);
+        return false;
     }
 
     private boolean maybeEnableArButton() {
@@ -290,6 +272,13 @@ public class MainActivity extends AppCompatActivity {
             // Enable AR functionality
             if (CameraPermissionHelper.hasCameraPermission(this)) {
                 measure_button.setEnabled(true);
+
+                measure_button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        openMeasure();
+                    }
+                });
             }
             return true;
         } else {
@@ -333,6 +322,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openSearch(String fishName) {
+        // Start Activity to display fish species information from database
         Intent searchIntent = new Intent(this, InformationActivity.class);
         searchIntent.putExtra("fishName", fishName);
         startActivity(searchIntent);
@@ -352,6 +342,7 @@ public class MainActivity extends AppCompatActivity {
         Source source = Source.SERVER;
 //        Source source = Source.DEFAULT;
 
+        // Query database for all contained records
         CollectionReference docRef = db.collection("fish");
         docRef.get(source).addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override

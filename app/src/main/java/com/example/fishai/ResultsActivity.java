@@ -49,7 +49,6 @@ import java.util.Map;
 import java.util.Objects;
 
 public class ResultsActivity extends AppCompatActivity {
-
 //    Bitmap image;
     private ResultsActivityBinding binding;
     private int counter;
@@ -60,7 +59,7 @@ public class ResultsActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private Map<String, Object> document;
 
-    @SuppressLint("WrongThread")
+//    @SuppressLint("WrongThread")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,8 +97,8 @@ public class ResultsActivity extends AppCompatActivity {
 */
 
         TextView fishNameView = findViewById(R.id.fish_name_result);
-        ImageView fishPicture = findViewById(R.id.result_image);
 
+        // If displayed fish matches the users expected result
         binding.buttonResultsYes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -107,9 +106,11 @@ public class ResultsActivity extends AppCompatActivity {
             }
         });
 
+        // If displayed fish does not match the users expected result
         binding.buttonResultsNo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Show the next fish until 3 fish species have been displayed
                 // Expected counter range = 0-2
                 if (counter < 2) {
                     counter++;
@@ -118,6 +119,8 @@ public class ResultsActivity extends AppCompatActivity {
 
                     getFishRecord(fishName);
                 } else {
+                    // If all 3 fish species are not correct, display an error message
+                    // and return user to the main screen
                     AlertDialog.Builder builder = new AlertDialog.Builder(ResultsActivity.this);
                     builder.setMessage(R.string.results_error_message).setPositiveButton(R.string.results_error_okay, new DialogInterface.OnClickListener() {
                         @Override
@@ -131,11 +134,10 @@ public class ResultsActivity extends AppCompatActivity {
         });
 
         if (image != null) {
-//            ImageView imageView = findViewById(R.id.result_image);
-//            imageView.setImageBitmap(rotateBitmap(image,90));
-
+            // Attempt to classify user input image per ML model
             results = performClassification(image);
 
+            // Display the first fish species to the user if classification successful
             if (results != null) {
                 counter = 0;
                 fishName = results.get(counter).getTitle().trim();
@@ -144,10 +146,6 @@ public class ResultsActivity extends AppCompatActivity {
                 getFishRecord(fishName);
             }
         }
-    }
-
-    protected void nextFish() {
-
     }
 
     @Override
@@ -199,6 +197,7 @@ public class ResultsActivity extends AppCompatActivity {
         Source source = Source.CACHE;
 //        Source source = Source.DEFAULT;
 
+        // Query database for fish species record
         DocumentReference docRef = db.collection("fish").document(fishName);
         docRef.get(source).addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -220,6 +219,7 @@ public class ResultsActivity extends AppCompatActivity {
     }
 
     private void populateFields() {
+        // Display fish species information if possible
         if (document != null) {
 /*
             name: String
@@ -247,40 +247,11 @@ public class ResultsActivity extends AppCompatActivity {
         startActivity(informationIntent);
     }
 
-/*
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-//            ImageView imageView = (ImageView) findViewById(R.id.result_image);
-//            ImageView imageView = findViewById(R.id.result_image);
-
-//            imageView.setImageBitmap(image);
-//            TextView textView = findViewById(R.id.textView);
-
-//            int counter = 1;
-//            textView.setText("Results: \n");
-            for (Classifier.Recognition result : results) {
-                textView.append(counter++ + ": " + result.toString() + "\n");
-            }
-
-    }
-*/
-
     protected List<Classifier.Recognition> performClassification(Bitmap image) {
+        // Attempt to classify fish image input by user
         try {
             Classifier classifier = new ClassifierFloatMobileNet(this, Classifier.Device.NNAPI, 1);
             List<Classifier.Recognition> results = classifier.recognizeImage(image, 90);
-
-//                TextView textView = findViewById(R.id.debug_text);
-//                int counter = 1;
-//                textView.setText("Results: \n");
-//                for (Classifier.Recognition result : results) {
-//                    textView.append(counter++ + ": " + result.toString() + "\n");
-//                }
-
-//                ImageView imageView = findViewById(R.id.result_image);
-//                imageView.setImageBitmap(loadImage(image, 90, classifier).getBitmap());
-//                image = loadImage(image, 270, classifier).getBitmap();
 
             classifier.close();
 
@@ -291,14 +262,14 @@ public class ResultsActivity extends AppCompatActivity {
         return null;
     }
 
-    public static Bitmap rotateBitmap(Bitmap source, float angle)
+    private static Bitmap rotateBitmap(Bitmap source, float angle)
     {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
-    /** Loads input image, and applies preprocessing. */
+/*
     private TensorImage loadImage(final Bitmap bitmap, int sensorOrientation, Classifier classifier) {
         // Loads bitmap into a TensorImage.
         TensorImage inputImageBuffer = new TensorImage();
@@ -316,4 +287,5 @@ public class ResultsActivity extends AppCompatActivity {
                         .build();
         return imageProcessor.process(inputImageBuffer);
     }
+*/
 }

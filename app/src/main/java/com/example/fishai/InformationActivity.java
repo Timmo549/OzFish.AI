@@ -42,12 +42,11 @@ public class InformationActivity extends AppCompatActivity {
     private InformationActivityBinding binding;
 
     private Map<String, Object> document;
+    private String fishName;
 
-    @SuppressLint("WrongThread")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         binding = InformationActivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -57,27 +56,19 @@ public class InformationActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         Bundle bundle = getIntent().getExtras();
-        String fishName = bundle.getString("fishName").trim();
+        fishName = bundle.getString("fishName").trim();
 
         TextView textView = findViewById(R.id.fish_name_text);
         textView.setText(fishName);
 
+        // Populate page with input fish species information
         getFishRecord(fishName);
 
+        // Check if application has camera permissions.
         checkCameraPermissionGiven();
 
         // Enable AR-related functionality on ARCore supported devices only.
-        if (maybeEnableArButton()) {
-            //arEnabled = true;
-
-            Button measure_button = findViewById(R.id.info_measure_button);
-            measure_button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    openMeasure(fishName);
-                }
-            });
-        }
+        maybeEnableArButton();
     }
 
     @Override
@@ -89,6 +80,8 @@ public class InformationActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        // Perform another check to enable AR functionalities
         maybeEnableArButton();
     }
 
@@ -149,6 +142,7 @@ public class InformationActivity extends AppCompatActivity {
         Source source = Source.CACHE;
 //        Source source = Source.DEFAULT;
 
+        // Query database for fish species record
         DocumentReference docRef = db.collection("fish").document(fishName);
         docRef.get(source).addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -159,23 +153,18 @@ public class InformationActivity extends AppCompatActivity {
                         // Document found
                         document = doc.getData();
                         populateFields();
-//                        TextView textView = findViewById(R.id.debug_text);
-//                        textView.setText("Document Found");
                     } else {
                         // Error, no document found
-//                        TextView textView = findViewById(R.id.debug_text);
-//                        textView.setText("Document Not Found");
                     }
                 } else {
                     // Error, something went wrong
-//                    TextView textView = findViewById(R.id.debug_text);
-//                    textView.setText("Document Error");
                 }
             }
         });
     }
 
     private void populateFields() {
+        // Display fish species information if possible
         if (document != null) {
 /*
             bag_limit: number
@@ -191,9 +180,7 @@ public class InformationActivity extends AppCompatActivity {
 
 
             TextView textView;
-/*            textView = findViewById(R.id.fish_name);
-            textView.setText(String.valueOf(document.get("name")));
-*/
+
             // Bag Limit
             textView = findViewById(R.id.bag_limit);
             Integer limit = Integer.valueOf(String.valueOf(document.get("bag_limit")));
@@ -207,7 +194,7 @@ public class InformationActivity extends AppCompatActivity {
             textView = findViewById(R.id.minimum_size);
             Integer size = Integer.valueOf(String.valueOf(document.get("minimum_size")));
             if (size != 0) {
-                textView.setText(size + "cm");
+                textView.setText(size + R.string.cm);
             } else {
                 textView.setText(R.string.none);
             }
@@ -280,6 +267,13 @@ public class InformationActivity extends AppCompatActivity {
             // Enable AR functionality
             if (CameraPermissionHelper.hasCameraPermission(this)) {
                 measure_button.setEnabled(true);
+
+                measure_button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        openMeasure(fishName);
+                    }
+                });
             }
             return true;
         } else {
