@@ -1077,7 +1077,10 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
           if (fishCompare) {
             result = findViewById(R.id.legal_size);
 
-            if (finalDistance >= Double.parseDouble(String.valueOf(document.get("minimum_size")))) {
+            if (finalUnits.equals(" m") && (finalDistance*100) >= Double.parseDouble(String.valueOf(document.get("minimum_size")))) {
+              result.setTextColor(Color.GREEN);
+              result.setText(R.string.yes);
+            } else if (finalUnits.equals(" cm") && finalDistance >= Double.parseDouble(String.valueOf(document.get("minimum_size")))) {
               result.setTextColor(Color.GREEN);
               result.setText(R.string.yes);
             } else {
