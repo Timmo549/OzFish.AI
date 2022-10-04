@@ -1,6 +1,5 @@
 package com.example.fishai;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,8 +29,6 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Source;
-
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.Map;
@@ -194,7 +191,7 @@ public class InformationActivity extends AppCompatActivity {
             textView = findViewById(R.id.minimum_size);
             Integer size = Integer.valueOf(String.valueOf(document.get("minimum_size")));
             if (size != 0) {
-                textView.setText(size + R.string.cm);
+                textView.setText(size.toString().concat(getString(R.string.cm)));
             } else {
                 textView.setText(R.string.none);
             }
@@ -249,7 +246,7 @@ public class InformationActivity extends AppCompatActivity {
         }
     }
 
-    private boolean maybeEnableArButton() {
+    private void maybeEnableArButton() {
         Button measure_button = findViewById(R.id.info_measure_button);
 
         // Query availability of AR functionality on host device
@@ -275,12 +272,10 @@ public class InformationActivity extends AppCompatActivity {
                     }
                 });
             }
-            return true;
         } else {
             // The device is unsupported or unknown.
             // AR not supported
             measure_button.setEnabled(false);
-            return false;
         }
     }
 

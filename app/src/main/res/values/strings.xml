@@ -111,7 +111,7 @@
     <string name="no">No</string>
     <string name="none">None</string>
 
-    <string name="cm">cm</string>
+    <string name="cm"> cm</string>
 
     <!-- Fish Database Record Names -->
     <string-array name="fish_dataset">
