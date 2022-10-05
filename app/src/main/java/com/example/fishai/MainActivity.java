@@ -61,8 +61,6 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
     private static long back_pressed;
-    private boolean arEnabled = false;
-    private boolean cameraEnabled = false;
 
     private String currentPhotoPath;
     private String fishToSearch;
@@ -223,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean maybeEnableCameraButton() {
+    private void maybeEnableCameraButton() {
         Button camera_button = findViewById(R.id.identify_button);
 
         // Test to see if the device has an available camera to leverage
@@ -236,13 +234,10 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) { openCamera(); }
                 });
-
-                return true;
             }
         } else {
             // No camera on this device, so disable the camera functionality
             camera_button.setEnabled(false);
-            return false;
         }
         // Continue to query availability at 2Hz in the background.
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
@@ -251,10 +246,9 @@ public class MainActivity extends AppCompatActivity {
                 maybeEnableCameraButton();
             }
         }, 500);
-        return false;
     }
 
-    private boolean maybeEnableArButton() {
+    private void maybeEnableArButton() {
         Button measure_button = findViewById(R.id.measure_button);
 
         // Query availability of AR functionality on host device
@@ -280,12 +274,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
-            return true;
         } else {
             // The device is unsupported or unknown.
             // AR not supported
             measure_button.setEnabled(false);
-            return false;
        }
     }
 
@@ -339,8 +331,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getFishRecords(boolean confirm) {
-        Source source = Source.SERVER;
-//        Source source = Source.DEFAULT;
+        //Source source = Source.SERVER;
+        Source source = Source.DEFAULT;
 
         // Query database for all contained records
         CollectionReference docRef = db.collection("fish");
