@@ -262,9 +262,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
 
       fishCompare = true;
     }
-
-
-
+    createHelpDialog();
   }
 
   // Creates the settings menu and adds it to the toolbar
@@ -286,15 +284,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
     // Menu items to launch feature specific settings.
     //noinspection SimplifiableIfStatement
     if (id == R.id.action_help) {
-      new AlertDialog.Builder(this)
-              .setMessage(R.string.helloaractivity_help_message)
-              .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int id) {
-                  dialogInterface.dismiss();
-                }
-              })
-              .show();
+      createHelpDialog();
       return true;
     } else if (id == R.id.depth_settings) {
       launchDepthSettingsMenuDialog();
@@ -1115,7 +1105,7 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
     }
   }
 */
-
+/*
   private void placeMidPointAnchor(){
     placeMidPointAnchor(wrappedAnchors.get(0).getAnchor().getPose(), wrappedAnchors.get(1).getAnchor().getPose());
   }
@@ -1127,14 +1117,6 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
             (objectPose0.tz() + objectPose1.tz())/2
     };
 
-/*
-    float[] midRotation = {
-            (objectPose0.qw() + objectPose1.qw())/2,
-            (objectPose0.qx() + objectPose1.qx())/2,
-            (objectPose0.qy() + objectPose1.qy())/2,
-            (objectPose0.qz() + objectPose1.qz())/2
-    };
-*/
     float[] midRotation = {
             0.0f,
             0.0f,
@@ -1144,6 +1126,19 @@ public class HelloArActivity extends AppCompatActivity implements SampleRender.R
 
     Pose midPoint = new Pose(midTranslation, midRotation);
     midAnchors.add(new WrappedAnchor(session.createAnchor(midPoint), null));
+  }
+*/
+
+  private void createHelpDialog() {
+    new AlertDialog.Builder(this)
+            .setMessage(R.string.helloaractivity_help_message)
+            .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialogInterface, int id) {
+                dialogInterface.dismiss();
+              }
+            })
+            .show();
   }
 
   private void getFishRecord(String fishName) {
