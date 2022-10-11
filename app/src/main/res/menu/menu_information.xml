@@ -7,4 +7,9 @@
         android:orderInCategory="100"
         android:title="@string/action_help"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_timestamp"
+        android:orderInCategory="101"
+        android:title="@string/last_updated"
+        app:showAsAction="never" />
 </menu>

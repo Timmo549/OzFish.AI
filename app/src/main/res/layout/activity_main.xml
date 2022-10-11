@@ -99,4 +99,20 @@
         app:strokeColor="#C9F4EB"
         app:strokeWidth="1dp" />
 
+    <TextView
+        android:id="@+id/textview_disclaimer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="sans-serif"
+        android:letterSpacing="0.01"
+        android:lineSpacingExtra="6sp"
+        android:text="@string/disclaimer"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

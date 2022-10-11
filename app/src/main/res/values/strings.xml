@@ -18,6 +18,11 @@
     <string name="identify_button">Identify Your Fish</string>
     <string name="measure_button">Measure Your Fish</string>
     <string name="search_button">Go Fishing (Search)</string>
+    <string name="disclaimer">
+        Disclaimer: All information is provided in this application as a guide only.
+        Ozfish.AI make no guarantees that any information supplied herein is 100\% accurate.
+        If in doubt, always consult official information sources (i.e. DPI).
+    </string>
 
 
     <!-- Help Menu Strings -->
@@ -112,6 +117,8 @@
     <string name="none">None</string>
 
     <string name="cm"> cm</string>
+    <string name="last_updated">Last Updated</string>
+    <string name="last_updated_message">Database Last Updated:\n</string>
 
     <!-- Fish Database Record Names -->
     <string-array name="fish_dataset">

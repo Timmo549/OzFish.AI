@@ -31,6 +31,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Source;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.Map;
 import java.util.Objects;
 
@@ -38,6 +39,7 @@ public class InformationActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private InformationActivityBinding binding;
 
+    private Map<String, Object> timestamp;
     private Map<String, Object> document;
     private String fishName;
 
@@ -60,6 +62,9 @@ public class InformationActivity extends AppCompatActivity {
 
         // Populate page with input fish species information
         getFishRecord(fishName);
+
+        // Populate database updated timestamp
+        getTimestamp();
 
         // Check if application has camera permissions.
         checkCameraPermissionGiven();
@@ -100,6 +105,20 @@ public class InformationActivity extends AppCompatActivity {
         if (id == R.id.action_help) {
             AlertDialog.Builder builder = new AlertDialog.Builder(InformationActivity.this);
             builder.setMessage(R.string.infoactivity_help_message).setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int id) {
+                    dialogInterface.dismiss();
+                }
+            });
+            builder.create().show();
+            return true;
+        } else if (id == R.id.action_timestamp) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(InformationActivity.this);
+            String message = "Unknown";
+            if (!String.valueOf(timestamp.get("last_updated")).contains("null")) {
+                message = getString(R.string.last_updated_message).concat(String.valueOf(new Timestamp(((com.google.firebase.Timestamp) timestamp.get("last_updated")).toDate().getTime())));
+            }
+            builder.setMessage(message).setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int id) {
                     dialogInterface.dismiss();
@@ -150,6 +169,29 @@ public class InformationActivity extends AppCompatActivity {
                         // Document found
                         document = doc.getData();
                         populateFields();
+                    } else {
+                        // Error, no document found
+                    }
+                } else {
+                    // Error, something went wrong
+                }
+            }
+        });
+    }
+
+    private void getTimestamp() {
+        Source source = Source.DEFAULT;
+
+        // Query database for last updated timestamp
+        DocumentReference docRef = db.collection("timestamp").document("timestamp");
+        docRef.get(source).addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot doc = task.getResult();
+                    if (doc.exists()) {
+                        // Document found
+                        timestamp = doc.getData();
                     } else {
                         // Error, no document found
                     }
