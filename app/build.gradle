@@ -17,18 +17,12 @@ android {
             keyAlias 'key0'
             keyPassword 'pRc5mwS$MzX4S#hiuXsW'
         }
-        'android-11-release' {
-            storePassword 'pRc5mwS$MzX4S#hiuXsW'
-            keyPassword 'pRc5mwS$MzX4S#hiuXsW'
-            keyAlias 'key0'
-            storeFile file('C:\\Users\\Tim-PC\\.android\\keystore.jks')
-        }
     }
     compileSdk 32
 
     defaultConfig {
         applicationId "com.example.fishai"
-        minSdk 28
+        minSdk 31
         targetSdk 32
         versionCode 1
         versionName "1.0.7"
@@ -44,9 +38,6 @@ android {
         }
         debug {
             signingConfig signingConfigs.debug
-        }
-        'android-11-release' {
-        signingConfig signingConfigs.'android-11-release'
         }
     }
     compileOptions {
